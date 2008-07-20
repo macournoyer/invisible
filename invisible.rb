@@ -1,37 +1,53 @@
-# Start w/ thin start -r invisible.rb
-require 'tenjin'
+require "rubygems"
+require "thin"
+require "markaby"
 
-module ::Invisible
-  class Adapter
-    def initialize
-      @template = Tenjin::Engine.new(:postfix=>'.rbhtml', :layout=>'../layout.rbhtml', :path=>'home')
-      @file = Rack::File.new('public')
-    end  
-    def call(env)
-      path = env['PATH_INFO']
-      if path.include?('.')
-        @file.call(env)
-      else
-        _, controller, action = env['PATH_INFO'].split('/')
-        Invisible.const_get("#{(controller || 'home').capitalize}Controller").new(@template, env).call(action || 'index')
-      end
+class Invisible
+  def initialize(&block)
+    @actions = []
+    @layouts = {}
+    instance_eval(&block)
+  end
+  
+  def process(method, route, &block)
+    @actions << [method.to_s, route, block]
+  end
+  def get(route, &b);  process("get",  route, &b) end
+  def post(route, &b); process("post", route, &b) end
+  
+  def render(status=200, options_and_headers={}, &block)
+    layout  = @layouts[options_and_headers.delete(:layout) || :default]
+    content = Markaby::Builder.new.capture(&block)
+    content = Markaby::Builder.new({ :content => content }, nil, &layout).to_s
+    [status, options_and_headers, content]
+  end
+  
+  def layout(name=:default, &block)
+    @layouts[name] = block
+  end
+  
+  def call(env)
+    params = nil
+    action = @actions.detect { |method, route, _| env["REQUEST_METHOD"].downcase == method && params = env["PATH_INFO"].match(route) }
+    
+    if action
+      action.last.call(*params[1..-1])
+    else
+      [404, {}, "Not found"]
     end
   end
-  class Controller
-    def initialize(template, env)
-      @template, @status, @env, @headers = template, 200, env, {'Content-Type' => 'text/html'}
+  
+  def run(*args)
+    app = self
+    Thin::Server.start(*args) do
+      use Rack::ShowExceptions
+      use Rack::CommonLogger
+      run app
     end
-    def call(action)
-      send(action)
-      render(action) unless @body
-      [@status, @headers.merge('Content-Length'=>@body.size.to_s), [@body]]
-    end
-    protected
-      def render(action=nil)
-        @body = @template.render(action.to_sym, instance_variables.inject({}) {|h,v| h[v[1..-1]] = instance_variable_get(v); h})
-      end
+  end
+  
+  def self.run(*args, &block)
+    new(&block).run(*args)
   end
 end
 
-require 'app/controllers'
-run Invisible::Adapter.new

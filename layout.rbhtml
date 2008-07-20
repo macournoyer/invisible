@@ -1,5 +1,0 @@
-<html>
-<body>
-#{@_content}
-</body>
-</html>
