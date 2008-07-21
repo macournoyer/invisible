@@ -46,13 +46,20 @@ class Invisible
     @views   = {}
     @helpers = Module.new
     @app     = self
+    @with    = []
     instance_eval(&block) if block
   end
   
   def process(method, route, &block)
-    @actions << [method.to_s, build_route(route), block]
+    @actions << [method.to_s, build_route(@with.join("/") + route), block]
   end
   HTTP_METHODS.each { |m| class_eval "def #{m}(r, &b); process('#{m}', r, &b) end" }
+  
+  def with(route)
+    @with.push(route)
+    yield
+    @with.pop
+  end
   
   # Render the response.
   # Render markaby by passing a block:

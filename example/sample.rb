@@ -16,11 +16,13 @@ layout do
   end
 end
 
-get "/echo/:stuff" do
-  session["stuff"] = params["stuff"]
-  render do
-    h2 "I echo stuff!"
-    p params['stuff']
+with "/echo" do
+  get "/:stuff" do
+    session["stuff"] = params["stuff"]
+    render do
+      h2 "I echo stuff!"
+      p params['stuff']
+    end
   end
 end
 
