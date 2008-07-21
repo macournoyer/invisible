@@ -1,12 +1,14 @@
+require File.dirname(__FILE__) + "/spec_helper"
+
 describe "render with layout" do
   before do
     @app = Invisible.new do
       layout do
-        text "default>"
+        text "markaby>"
         text content
       end
       
-      get "/text" do
+      get "/text-in-markaby" do
         render "text"
       end
       
@@ -31,12 +33,12 @@ describe "render with layout" do
     end
   end
   
-  it "should render text inside default layout" do
-    @app.mock.get("/text").body.should == "default>text"
+  it "should render text inside default markaby layout" do
+    @app.mock.get("/text-in-markaby").body.should == "markaby>text"
   end
 
-  it "should render markaby inside default layout" do
-    @app.mock.get("/markaby").body.should == "default>markaby"
+  it "should render markaby inside default markaby layout" do
+    @app.mock.get("/markaby").body.should == "markaby>markaby"
   end
 
   it "should render inside no layout" do
