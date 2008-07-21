@@ -50,7 +50,7 @@ describe "render" do
     @app.mock.get("/text").status.should == 200
   end
   
-  xit "should allow render anywhere" do
+  it "should allow render anywhere" do
     @app.mock.get("/anywhere").body.should == "anywhere"
   end
 end

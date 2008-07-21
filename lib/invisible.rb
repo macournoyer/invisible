@@ -38,7 +38,7 @@ require "markaby"
 # 
 class Invisible
   HTTP_METHODS = [:get, :post, :head, :put, :delete]
-  attr_reader :request, :params
+  attr_reader :request, :response, :params
   
   def initialize(&block)
     @actions = []
@@ -65,12 +65,13 @@ class Invisible
   #
   def render(*args, &block)
     options = args.last.is_a?(Hash) ? args.pop : {}
-    status  = options.delete(:status) || 200
+    @response.status = options.delete(:status) || 200
     layout  = @layouts[options.delete(:layout) || :default]
-    assigns = { :request => request, :params => params, :session => session }
+    assigns = { :request => request, :response => response, :params => params, :session => session }
     content = args.last.is_a?(String) ? args.last : Markaby::Builder.new(assigns, @helpers, &(block || @views[args.last])).to_s
     content = Markaby::Builder.new(assigns.merge(:content => content), @helpers, &layout).to_s if layout
-    [status, options, content]
+    @response.headers.merge!(options)
+    @response.body = content
   end
   
   def layout(name=:default, &block)
@@ -87,11 +88,13 @@ class Invisible
   end
   
   def call(env)
-    @request = Rack::Request.new(env)
-    @params  = @request.params
+    @request  = Rack::Request.new(env)
+    @response = Rack::Response.new
+    @params   = @request.params
     if action = recognize(env["PATH_INFO"], @params["_method"] || env["REQUEST_METHOD"])
       @params.merge!(@path_params)
       action.last.call
+      @response.finish
     else
       [404, {}, "Not found"]
     end
