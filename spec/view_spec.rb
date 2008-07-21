@@ -10,10 +10,18 @@ describe "view" do
       get "/" do
         render :name
       end
+
+      get "/missing" do
+        render :missing
+      end
     end
   end
   
   it "should render named view" do
     @app.mock.get("/").body.should == "view"
+  end
+
+  it "should render missing view" do
+    @app.mock.get("/missing").body.should == ""
   end
 end

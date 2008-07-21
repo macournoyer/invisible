@@ -14,6 +14,10 @@ describe "routing" do
       get "/" do
         render "/"
       end
+      
+      get "no/slash" do
+        render "no-slash"
+      end
     end
   end
   
@@ -31,5 +35,13 @@ describe "routing" do
 
   it "should route /param/:param" do
     @app.mock.get("/param/ohaie").body.should == "ohaie"
+  end
+  
+  it "should route with no leading slash" do    
+    @app.mock.get("/no/slash").body.should == "no-slash"
+  end
+
+  it "should route ignore trailing slash" do    
+    @app.mock.get("/no/slash/").body.should == "no-slash"
   end
 end
