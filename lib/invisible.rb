@@ -22,7 +22,7 @@ class Invisible
     status  = args.first.is_a?(Fixnum) ? args.shift : 200
     options = args.last.is_a?(Hash) ? args.pop : {}
     layout  = @layouts[options.delete(:layout) || :default]
-    assigns = { :request => @request, :params => params }
+    assigns = { :request => request, :params => params, :session => session }
     content = block ? Markaby::Builder.new(assigns, nil, &block).to_s : args.last
     content = Markaby::Builder.new(assigns.merge(:content => content), nil, &layout).to_s if layout
     [status, options, content]
@@ -41,6 +41,11 @@ class Invisible
     else
       [404, {}, "Not found"]
     end
+  end
+  
+  # Add `use Rack::Session::Cookie` to use
+  def session
+    @request.env["rack.session"]
   end
   
   def use(middleware, *args)
