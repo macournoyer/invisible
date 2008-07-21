@@ -9,6 +9,7 @@ class Invisible
   def initialize(&block)
     @actions = []
     @layouts = {}
+    @helpers = Module.new
     @app     = self
     instance_eval(&block) if block
   end
@@ -23,13 +24,18 @@ class Invisible
     options = args.last.is_a?(Hash) ? args.pop : {}
     layout  = @layouts[options.delete(:layout) || :default]
     assigns = { :request => request, :params => params, :session => session }
-    content = block ? Markaby::Builder.new(assigns, nil, &block).to_s : args.last
-    content = Markaby::Builder.new(assigns.merge(:content => content), nil, &layout).to_s if layout
+    content = block ? Markaby::Builder.new(assigns, @helpers, &block).to_s : args.last
+    content = Markaby::Builder.new(assigns.merge(:content => content), @helpers, &layout).to_s if layout
     [status, options, content]
   end
   
   def layout(name=:default, &block)
     @layouts[name] = block
+  end
+  
+  def helpers(&block)
+    @helpers.instance_eval(&block)
+    instance_eval(&block)
   end
   
   def call(env)

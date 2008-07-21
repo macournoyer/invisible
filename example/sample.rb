@@ -1,6 +1,12 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require "invisible"
 
+helpers do
+  def time
+    Time.now.to_s
+  end
+end
+
 layout do
   html do
     body do
@@ -20,7 +26,7 @@ end
 
 get "/" do
   render do
-    h2 "Welcome"
+    h2 "Welcome, it's #{@helpers.time}"
     p params["oh"]
     p session["stuff"]
   end
