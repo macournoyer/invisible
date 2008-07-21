@@ -18,6 +18,15 @@ describe "render" do
           text request.class.name
         end
       end
+      
+      get "/status" do
+        render "", :status => 201
+      end
+      
+      get "/anywhere" do
+        render "anywhere"
+        "ohnoz!"
+      end
     end
   end
   
@@ -31,5 +40,17 @@ describe "render" do
   
   it "should assign request inside markaby builder" do
     @app.mock.get("/request").body.should == "Rack::Request"
+  end
+  
+  it "should use specified status" do
+    @app.mock.get("/status").status.should == 201
+  end
+  
+  it "should use default status to 200" do
+    @app.mock.get("/text").status.should == 200
+  end
+  
+  xit "should allow render anywhere" do
+    @app.mock.get("/anywhere").body.should == "anywhere"
   end
 end

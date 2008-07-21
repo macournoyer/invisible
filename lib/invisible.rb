@@ -64,15 +64,11 @@ class Invisible
   #  render "some text"
   #
   def render(*args, &block)
-    status  = args.first.is_a?(Fixnum) ? args.shift : 200
     options = args.last.is_a?(Hash) ? args.pop : {}
+    status  = options.delete(:status) || 200
     layout  = @layouts[options.delete(:layout) || :default]
     assigns = { :request => request, :params => params, :session => session }
-    content = case args.last
-    when String   then args.last
-    when Symbol   then Markaby::Builder.new(assigns, @helpers, &@views[args.last]).to_s
-    when NilClass then Markaby::Builder.new(assigns, @helpers, &block).to_s
-    end
+    content = args.last.is_a?(String) ? args.last : Markaby::Builder.new(assigns, @helpers, &(block || @views[args.last])).to_s
     content = Markaby::Builder.new(assigns.merge(:content => content), @helpers, &layout).to_s if layout
     [status, options, content]
   end
