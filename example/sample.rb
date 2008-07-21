@@ -13,14 +13,14 @@ end
 get "/echo/:stuff" do
   render do
     h2 "I echo stuff!"
-    # p @params['stuff']
+    p params['stuff']
   end
 end
 
 get "/" do
   render do
     h2 "Welcome"
-    p request.params["oh"]
+    p params["oh"]
   end
 end
 
