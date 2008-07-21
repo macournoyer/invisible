@@ -14,7 +14,7 @@ class Invisible
   end
   
   def process(method, route, &block)
-    @actions << [method.to_s, route, block]
+    @actions << [method.to_s, build_route(route), block]
   end
   HTTP_METHODS.each { |m| class_eval "def #{m}(r, &b); process('#{m}', r, &b) end" }
   
@@ -22,7 +22,7 @@ class Invisible
     status  = args.first.is_a?(Fixnum) ? args.shift : 200
     options = args.last.is_a?(Hash) ? args.pop : {}
     layout  = @layouts[options.delete(:layout) || :default]
-    assigns = { :request => @request }
+    assigns = { :request => @request, :params => params }
     content = block ? Markaby::Builder.new(assigns, nil, &block).to_s : args.last
     content = Markaby::Builder.new(assigns.merge(:content => content), nil, &layout).to_s if layout
     [status, options, content]
@@ -32,13 +32,17 @@ class Invisible
     @layouts[name] = block
   end
   
+  def params
+    @params
+  end
+  
   def call(env)
     @request = Rack::Request.new(env)
     params = nil
-    action = @actions.detect { |method, route, _| env["REQUEST_METHOD"].downcase == method && params = env["PATH_INFO"].match(route) }
+    action = recognize(env["PATH_INFO"], env["REQUEST_METHOD"])
     
     if action
-      action.last.call(*params[1..-1])
+      action.last.call
     else
       [404, {}, "Not found"]
     end
@@ -63,6 +67,29 @@ class Invisible
   def self.call(env)
     @app.call(env)
   end
+  
+  private
+    def build_route(route)
+      segments = route.split("/")
+      pattern  = segments.inject('\/*') do |regex, segment|
+        regex << (segment[0] == ?: ? '(\w+)' : segment) + '\/*'
+      end + '\/*'
+      [/^#{pattern}$/i, route.scan(/\:(\w+)/).flatten]
+    end
+    
+    def recognize(url, method)
+      method = method.to_s.downcase
+      @actions.detect do |m, (pattern, keys), _|
+        method == m && @params = match_route(pattern, keys, url)
+      end
+    end
+    
+    def match_route(pattern, keys, url)
+      matches = (url.match(pattern) || return)[1..-1]
+      params  = {}
+      keys.each_with_index { |key, i| params[key] = matches[i] }
+      params
+    end
 end
 
 def method_missing(method, *args, &block)

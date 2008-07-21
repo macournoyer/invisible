@@ -10,10 +10,10 @@ layout do
   end
 end
 
-get /\/echo\/(\w+)/ do |stuff|
+get "/echo/:stuff" do
   render do
     h2 "I echo stuff!"
-    p stuff
+    # p @params['stuff']
   end
 end
 
