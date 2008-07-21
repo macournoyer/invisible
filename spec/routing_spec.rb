@@ -13,7 +13,7 @@ describe "routing" do
       
       get "/" do
         render "/"
-      end      
+      end
     end
   end
   

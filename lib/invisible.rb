@@ -4,7 +4,7 @@ require "markaby"
 
 class Invisible
   HTTP_METHODS = [:get, :post, :head, :put, :delete]
-  attr_reader :request
+  attr_reader :request, :params
   
   def initialize(&block)
     @actions = []
@@ -32,16 +32,9 @@ class Invisible
     @layouts[name] = block
   end
   
-  def params
-    @params
-  end
-  
   def call(env)
     @request = Rack::Request.new(env)
-    params = nil
-    action = recognize(env["PATH_INFO"], env["REQUEST_METHOD"])
-    
-    if action
+    if action = recognize(env["PATH_INFO"], env["REQUEST_METHOD"])
       action.last.call
     else
       [404, {}, "Not found"]
@@ -70,10 +63,7 @@ class Invisible
   
   private
     def build_route(route)
-      segments = route.split("/")
-      pattern  = segments.inject('\/*') do |regex, segment|
-        regex << (segment[0] == ?: ? '(\w+)' : segment) + '\/*'
-      end + '\/*'
+      pattern = route.split("/").inject('\/*') { |r, s| r << (s[0] == ?: ? '(\w+)' : s) + '\/*' } + '\/*'
       [/^#{pattern}$/i, route.scan(/\:(\w+)/).flatten]
     end
     
@@ -85,8 +75,7 @@ class Invisible
     end
     
     def match_route(pattern, keys, url)
-      matches = (url.match(pattern) || return)[1..-1]
-      params  = {}
+      matches, params = (url.match(pattern) || return)[1..-1], {}
       keys.each_with_index { |key, i| params[key] = matches[i] }
       params
     end
