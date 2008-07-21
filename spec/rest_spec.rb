@@ -36,4 +36,12 @@ describe "REST" do
   it "should respond to DELETE /" do
     @app.mock.delete("/").body.should == "delete it?"
   end
+  
+  it "should use _method request param" do
+    @app.mock.post("/?_method=put").body.should == "put it?"
+  end
+
+  it "should use _method form param" do
+    @app.mock.post("/", :input => "_method=put").body.should == "put it?"
+  end
 end

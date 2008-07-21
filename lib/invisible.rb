@@ -34,7 +34,9 @@ class Invisible
   
   def call(env)
     @request = Rack::Request.new(env)
-    if action = recognize(env["PATH_INFO"], env["REQUEST_METHOD"])
+    @params  = @request.params
+    if action = recognize(env["PATH_INFO"], @params["_method"] || env["REQUEST_METHOD"])
+      @params.merge!(@path_params)
       action.last.call
     else
       [404, {}, "Not found"]
@@ -70,7 +72,7 @@ class Invisible
     def recognize(url, method)
       method = method.to_s.downcase
       @actions.detect do |m, (pattern, keys), _|
-        method == m && @params = match_route(pattern, keys, url)
+        method == m && @path_params = match_route(pattern, keys, url)
       end
     end
     
