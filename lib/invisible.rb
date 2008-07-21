@@ -4,7 +4,7 @@ require "markaby"
 
 class Invisible
   HTTP_METHODS = [:get, :post, :head, :put, :delete]
-  attr_reader :request, :actions
+  attr_reader :request
   
   def initialize(&block)
     @actions = []
@@ -21,14 +21,10 @@ class Invisible
   def render(*args, &block)
     status  = args.first.is_a?(Fixnum) ? args.shift : 200
     options = args.last.is_a?(Hash) ? args.pop : {}
-    if block
-      layout  = @layouts[options.delete(:layout) || :default]
-      assigns = { :request => @request }
-      content = Markaby::Builder.new(assigns, nil, &block).to_s
-      content = Markaby::Builder.new(assigns.merge(:content => content), nil, &layout).to_s if layout
-    else
-      content = args.last
-    end
+    layout  = @layouts[options.delete(:layout) || :default]
+    assigns = { :request => @request }
+    content = block ? Markaby::Builder.new(assigns, nil, &block).to_s : args.last
+    content = Markaby::Builder.new(assigns.merge(:content => content), nil, &layout).to_s if layout
     [status, options, content]
   end
   
