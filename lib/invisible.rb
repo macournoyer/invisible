@@ -4,7 +4,7 @@ require "markaby"
 
 # = The Invisible framework class
 # If Camping is a micro-framwork at 4K then Invisible is a pico-framework of 2K.
-# Half the size mainly because of Rack. Many ideas were barrowed from Sinatra,
+# Half the size mainly because of Rack. Many ideas were borrowed from Sinatra,
 # but with a few more opinions on my own and a strong emphasis on compactness.
 #
 # == Build an app in an object
@@ -59,9 +59,9 @@ class Invisible
   #  end
   #
   def action(method, route, &block)
-    @actions << [method.to_s, build_route(@with.join("/") + route), block]
+    @actions << [method.to_s, build_route(@with * "/" + route), block]
   end
-  HTTP_METHODS.each { |m| class_eval "def #{m}(r='/', &b); action('#{m}', r, &b) end" }
+  HTTP_METHODS.each { |m| class_eval "def #{m}(r='/',&b); action('#{m}', r, &b) end" }
   
   # Wrap actions sharing a common base route.
   #

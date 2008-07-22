@@ -1,1 +1,41 @@
-The fastest framework that you should never use.
+= The Invisible framework class
+If Camping is a micro-framwork at 4K then Invisible is a pico-framework of 2K.
+Half the size mainly because of Rack. Many ideas were borrowed from Sinatra,
+but with a few more opinions on my own and a strong emphasis on compactness.
+
+== Build an app in an object
+Invisible supports multiple applications running in the same VM. Each instance
+of this class represents a runnable application.
+
+ app = Invisible.new do
+   get "/" do
+     render "ohaie"
+   end
+ end
+
+== Build an app in a file
+DSL like Sinatra is also supported, put all your `get`, `post`, `layout` in your
+naked file and Invisible will do the method_missing magic for you.
+
+== Your app is a Rack config file (or not)
+Often the problem with new frameworks is you have to find how to deploy it.
+You either can make your app file standalone and runnable on its own, put this
+at the end of your file:
+
+ app.run
+
+Or to use as a Rack config file, switch the 2 and remove the dot
+
+ run app
+
+Then you'll be able to run with Thin:
+
+ thin start -R app.ru
+
+See example directory for more example.
+
+=== License
+Ruby License, http://www.ruby-lang.org/en/LICENSE.txt.
+
+=== Credits
+Invisible is copyright Marc-Andre Cournoyer <macournoyer@gmail.com>
