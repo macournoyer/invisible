@@ -3,7 +3,7 @@ require "thin"
 require "markaby"
 
 # = The Invisible framework class
-# If Camping was a micro-framwork at 4K then Invisible is a pico-framework of 2K.
+# If Camping is a micro-framwork at 4K then Invisible is a pico-framework of 2K.
 # Half the size mainly because of Rack. Many ideas were barrowed from Sinatra,
 # but with a few more opinions on my own and a strong emphasis on compactness.
 #
@@ -40,35 +40,58 @@ class Invisible
   HTTP_METHODS = [:get, :post, :head, :put, :delete]
   attr_reader :request, :response, :params
   
+  # Creates a new Invisible Rack application. You can build your app
+  # in the yielded block or using the app instance.
   def initialize(&block)
     @actions = []
+    @with    = []
     @layouts = {}
     @views   = {}
     @helpers = Module.new
     @app     = self
-    @with    = []
     instance_eval(&block) if block
   end
   
-  def process(method, route, &block)
+  # Register an action for a specified +route+.
+  # 
+  #  get "/" do
+  #    # ...
+  #  end
+  #
+  def action(method, route, &block)
     @actions << [method.to_s, build_route(@with.join("/") + route), block]
   end
-  HTTP_METHODS.each { |m| class_eval "def #{m}(r, &b); process('#{m}', r, &b) end" }
+  HTTP_METHODS.each { |m| class_eval "def #{m}(r='/', &b); action('#{m}', r, &b) end" }
   
+  # Wrap actions sharing a common base route.
+  #
+  #  with "/lol" do
+  #    get "/cat" # ...
+  #  end
+  #
+  # Will register an action on GET /lol/cat.
+  # You can nested as many level as you want.
   def with(route)
     @with.push(route)
     yield
     @with.pop
   end
   
-  # Render the response.
+  # Render the response inside an action.
   # Render markaby by passing a block:
   #
-  #  render "some text"
+  #  render do
+  #    h1 "Poop"
+  #    p "Smells!"
+  #  end
   # 
   # or simple text as the first argument.
   # 
-  #  render "some text"
+  #  render "crap"
+  #
+  # You can also pass some option or headers:
+  #
+  #  render "heck", :status => 201, :layout => :none, 'X-Crap-Level' => 'ubersome'
   #
   def render(*args, &block)
     options = args.last.is_a?(Hash) ? args.pop : {}
@@ -81,19 +104,51 @@ class Invisible
     @response.body = content
   end
   
+  # Register a layout to be used around +render+ed text.
+  # Use markaby inside your block.
   def layout(name=:default, &block)
     @layouts[name] = block
   end
   
+  # Register a named view to be used from <tt>render :name</tt>.
+  # Use markaby inside your block.
+  def view(name, &block)
+    @views[name] = block
+  end
+  
+  # Define helper methods to be used inside the actions and inside
+  # the views.
+  # Inside markaby, helpers are added to the @helpers object:
+  #
+  #  my_helper
+  #  render do
+  #    @helpers.my_helper
+  #  end
+  #
   def helpers(&block)
     @helpers.instance_eval(&block)
     instance_eval(&block)
   end
   
-  def view(name, &block)
-    @views[name] = block
+  # Return the current session.
+  # Add `use Rack::Session::Cookie` to use.
+  def session
+    @request.env["rack.session"]
   end
   
+  # Register a Rack middleware wrapping the
+  # current application.
+  def use(middleware, *args)
+    @app = middleware.new(@app, *args)
+  end
+  
+  # Run the application using Thin.
+  # All arguments are passed to Thin::Server.start.
+  def run(*args)
+    Thin::Server.start(@app, *args)
+  end
+  
+  # Called by the Rack handler to process a request.
   def call(env)
     @request  = Rack::Request.new(env)
     @response = Rack::Response.new
@@ -107,19 +162,7 @@ class Invisible
     end
   end
   
-  # Add `use Rack::Session::Cookie` to use
-  def session
-    @request.env["rack.session"]
-  end
-  
-  def use(middleware, *args)
-    @app = middleware.new(@app, *args)
-  end
-  
-  def run(*args)
-    Thin::Server.start(@app, *args)
-  end
-  
+  # Allow to defined and run an application in a single call.
   def self.run(*args, &block)
     new(&block).run(*args)
   end
