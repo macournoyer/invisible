@@ -1,7 +1,8 @@
 = The Invisible framework class
-If Camping is a micro-framwork at 4K then Invisible is a pico-framework of 2K.
-Half the size mainly because of Rack. Many ideas were borrowed from Sinatra,
-but with a few more opinions on my own and a strong emphasis on compactness.
+If Camping is a micro-framwork at 4K in size then Invisible is a pico-framework
+of 2K (around 200 LOC). Half the size mainly because of Rack. Many ideas were
+borrowed from Sinatra, but with a few more opinions on my own and a strong emphasis
+on compactness.
 
 == Build an app in an object
 Invisible supports multiple applications running in the same VM. Each instance
