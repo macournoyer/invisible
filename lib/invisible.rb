@@ -48,7 +48,7 @@ class Invisible
     @layouts = {}
     @views   = {}
     @helpers = Module.new
-    @app     = self
+    @app     = Rack::Cascade.new([Rack::File.new("public"), method(:_call)])
     instance_eval(&block) if block
   end
   
@@ -150,16 +150,7 @@ class Invisible
   
   # Called by the Rack handler to process a request.
   def call(env)
-    @request  = Rack::Request.new(env)
-    @response = Rack::Response.new
-    @params   = @request.params
-    if action = recognize(env["PATH_INFO"], @params["_method"] || env["REQUEST_METHOD"])
-      @params.merge!(@path_params)
-      action.last.call
-      @response.finish
-    else
-      [404, {}, "Not found"]
-    end
+    @app.call(env)
   end
   
   # Allow to defined and run an application in a single call.
@@ -176,6 +167,19 @@ class Invisible
   end
   
   private
+    def _call(env)
+      @request  = Rack::Request.new(env)
+      @response = Rack::Response.new
+      @params   = @request.params
+      if action = recognize(env["PATH_INFO"], @params["_method"] || env["REQUEST_METHOD"])
+        @params.merge!(@path_params)
+        action.last.call
+        @response.finish
+      else
+        [404, {}, "Not found"]
+      end
+    end
+    
     def build_route(route)
       pattern = route.split("/").inject('\/*') { |r, s| r << (s[0] == ?: ? '(\w+)' : s) + '\/*' } + '\/*'
       [/^#{pattern}$/i, route.scan(/\:(\w+)/).flatten]
