@@ -37,18 +37,19 @@ require "markaby"
 #  thin start -R app.ru
 # 
 class Invisible
-  HTTP_METHODS = [:get, :post, :head, :put, :delete]
-  attr_reader :request, :response, :params
+  HTTP_METHODS    = [:get, :post, :head, :put, :delete]
+  VISIBLE_METHODS = HTTP_METHODS + [:with, :layout, :view, :helpers, :use, :run]
+  attr_reader :actions, :request, :response, :params
   
   # Creates a new Invisible Rack application. You can build your app
   # in the yielded block or using the app instance.
   def initialize(&block)
-    @actions = []
-    @with    = []
-    @layouts = {}
-    @views   = {}
-    @helpers = Module.new
-    @app     = Rack::Cascade.new([Rack::File.new("public"), method(:_call)])
+    @actions     = []
+    @with        = []
+    @layouts     = {}
+    @views       = {}
+    @helpers     = Module.new
+    @app         = method(:_call)
     instance_eval(&block) if block
   end
   
@@ -158,12 +159,13 @@ class Invisible
     new(&block).run(*args)
   end
   
-  def self.app
-    @app ||= self.new
+  def self.boot(object)
+    $invisible = Invisible.new
+    VISIBLE_METHODS.each { |m| object.instance_eval "def #{m}(*a, &b); $invisible.#{m}(*a, &b); end" }
   end
   
   def self.call(env)
-    @app.call(env)
+    $invisible.call(env)
   end
   
   private
@@ -173,7 +175,7 @@ class Invisible
       @params   = @request.params
       if action = recognize(env["PATH_INFO"], @params["_method"] || env["REQUEST_METHOD"])
         @params.merge!(@path_params)
-        action.last.call
+        instance_eval(&action.last)
         @response.finish
       else
         [404, {}, "Not found"]
@@ -197,12 +199,4 @@ class Invisible
       keys.each_with_index { |key, i| params[key] = matches[i] }
       params
     end
-end
-
-def method_missing(method, *args, &block)
-  if Invisible.app.respond_to?(method)
-    Invisible.app.send(method, *args, &block)
-  else
-    super
-  end
 end

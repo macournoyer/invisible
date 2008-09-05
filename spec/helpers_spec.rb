@@ -15,7 +15,7 @@ describe "params" do
       
       get "/in-markaby" do
         render do
-          text @helpers.help_me
+          help_me
         end
       end
     end

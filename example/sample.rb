@@ -2,13 +2,18 @@ $:.unshift File.dirname(__FILE__) + "/../lib"
 require "invisible"
 
 helpers do
-  def time
+  def time_helper
     Time.now.to_s
   end
 end
 
 layout do
-  html do
+  instruct!
+  xhtml_transitional do
+    head do
+      title "You don't see this it's invisible"
+      link :href => "/style.css", :media => "screen", :rel => "stylesheet", :type => "text/css"
+    end
     body do
       h1 "Ohaie"
       text content
@@ -26,17 +31,24 @@ with "/echo" do
   end
 end
 
+get "/style.css" do
+  render <<-EOS, 'Content-Type' => 'text/css', :layout => :none
+    body, p, ol, ul, td { font-family: verdana, arial, helvetica, sans-serif }
+  EOS
+end
+
 get "/" do
   render do
-    h2 "Welcome, it's #{@helpers.time}"
+    h2 "Welcome, it's #{time_helper}"
     p params["oh"]
     p session["stuff"]
   end
 end
 
+use Rack::Static, :urls => %w(/stylesheets /images), :root => "public" # To serve static files
 use Rack::ShowExceptions
 use Rack::CommonLogger
-use Rack::Session::Cookie
+use Rack::Session::Cookie # For session support
 
 run
 
