@@ -1,24 +1,15 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require "invisible"
+require "invisible/erb"
 
 Invisible.run do
+  view_root File.dirname(__FILE__)
+  
   def time_helper
     Time.now.to_s
   end
 
-  layout do
-    instruct!
-    xhtml_transitional do
-      head do
-        title "You don't see this, it's invisible"
-        link :href => "/style.css", :media => "screen", :rel => "stylesheet", :type => "text/css"
-      end
-      body do
-        h1 "Ohaie"
-        text @content
-      end
-    end
-  end
+  layout { erb(:layout) }
 
   with "/echo" do
     get "/:stuff" do
@@ -30,12 +21,6 @@ Invisible.run do
     end
   end
 
-  get "/style.css" do
-    render <<-EOS, 'Content-Type' => 'text/css', :layout => :none
-      body, p, ol, ul, td { font-family: verdana, arial, helvetica, sans-serif }
-    EOS
-  end
-
   get "/" do
     render do
       h2 "Welcome, it's #{time_helper}"
@@ -44,7 +29,7 @@ Invisible.run do
     end
   end
 
-  use Rack::Static, :urls => %w(/stylesheets /images), :root => "public" # To serve static files
+  use Rack::Static, :urls => %w(/style.css), :root => File.dirname(__FILE__) # To serve static files
   use Rack::ShowExceptions
   use Rack::CommonLogger
   use Rack::Session::Cookie # For session support

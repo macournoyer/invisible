@@ -4,9 +4,11 @@ require "invisible/erb"
 describe "erb" do
   before do
     @app = Invisible.new do
+      view_root File.dirname(__FILE__)
+      
       get "/text" do
         @ohaie = "ivar"
-        render erb("#{File.dirname(__FILE__)}/fixtures/ohaie")
+        render erb("fixtures/ohaie")
       end
     end
   end
