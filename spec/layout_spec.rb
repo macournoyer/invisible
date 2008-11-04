@@ -5,7 +5,7 @@ describe "render with layout" do
     @app = Invisible.new do
       layout do
         text "markaby>"
-        text content
+        text @content
       end
       
       get "/text-in-markaby" do
@@ -24,7 +24,7 @@ describe "render with layout" do
       
       layout :named do
         text "named>"
-        text content
+        text @content
       end
       
       get "/named" do

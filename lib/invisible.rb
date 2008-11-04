@@ -1,7 +1,4 @@
-require "rubygems"
-require "thin"
-require "markaby"
-
+%w(rubygems rack markaby).each { |f| require f }
 # = The Invisible framework class
 # If Camping is a micro-framwork at 4K then Invisible is a pico-framework of 2K.
 # Half the size mainly because of Rack. Many ideas were borrowed from Sinatra,
@@ -37,19 +34,13 @@ require "markaby"
 #  thin start -R app.ru
 # 
 class Invisible
-  HTTP_METHODS    = [:get, :post, :head, :put, :delete]
-  VISIBLE_METHODS = HTTP_METHODS + [:with, :layout, :view, :helpers, :use, :run]
+  HTTP_METHODS = [:get, :post, :head, :put, :delete]
   attr_reader :actions, :request, :response, :params
   
   # Creates a new Invisible Rack application. You can build your app
   # in the yielded block or using the app instance.
   def initialize(&block)
-    @actions     = []
-    @with        = []
-    @layouts     = {}
-    @views       = {}
-    @helpers     = Module.new
-    @app         = method(:_call)
+    @actions, @with, @layouts, @views, @helpers, @app = [], [], {}, {}, self, method(:_call)
     instance_eval(&block) if block
   end
   
@@ -99,10 +90,10 @@ class Invisible
     @response.status = options.delete(:status) || 200
     layout  = @layouts[options.delete(:layout) || :default]
     assigns = { :request => request, :response => response, :params => params, :session => session }
-    content = args.last.is_a?(String) ? args.last : Markaby::Builder.new(assigns, @helpers, &(block || @views[args.last])).to_s
-    content = Markaby::Builder.new(assigns.merge(:content => content), @helpers, &layout).to_s if layout
+    @content = args.last.is_a?(String) ? args.last : Markaby::Builder.new(assigns, self, &(block || @views[args.last])).to_s
+    @content = Markaby::Builder.new(assigns, self, &layout).to_s if layout
     @response.headers.merge!(options)
-    @response.body = content
+    @response.body = @content
   end
   
   # Register a layout to be used around +render+ed text.
@@ -115,20 +106,6 @@ class Invisible
   # Use markaby inside your block.
   def view(name, &block)
     @views[name] = block
-  end
-  
-  # Define helper methods to be used inside the actions and inside
-  # the views.
-  # Inside markaby, helpers are added to the @helpers object:
-  #
-  #  my_helper
-  #  render do
-  #    @helpers.my_helper
-  #  end
-  #
-  def helpers(&block)
-    @helpers.instance_eval(&block)
-    instance_eval(&block)
   end
   
   # Return the current session.
@@ -146,6 +123,7 @@ class Invisible
   # Run the application using Thin.
   # All arguments are passed to Thin::Server.start.
   def run(*args)
+    require "thin"
     Thin::Server.start(@app, *args)
   end
   
@@ -157,15 +135,6 @@ class Invisible
   # Allow to defined and run an application in a single call.
   def self.run(*args, &block)
     new(&block).run(*args)
-  end
-  
-  def self.boot(object)
-    $invisible = Invisible.new
-    VISIBLE_METHODS.each { |m| object.instance_eval "def #{m}(*a, &b); $invisible.#{m}(*a, &b); end" }
-  end
-  
-  def self.call(env)
-    $invisible.call(env)
   end
   
   private
