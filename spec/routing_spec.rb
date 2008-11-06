@@ -8,7 +8,7 @@ describe "routing" do
       end
       
       get "/param/:name" do
-        render params["name"]
+        render params[:name]
       end
       
       get "/" do

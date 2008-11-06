@@ -4,12 +4,12 @@ describe "session" do
   before do
     @app = Invisible.new do
       put "/:value" do
-        session["param"] = params["value"]
+        session[:param] = params[:value]
         render "ok"
       end
       
       get "/" do
-        render session["param"]
+        render session[:param]
       end
       
       use Rack::Session::Cookie

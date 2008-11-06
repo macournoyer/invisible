@@ -1,4 +1,4 @@
-%w(rubygems rack markaby).each { |f| require f }
+%w(rubygems rack markaby invisible/core_ext).each { |f| require f }
 # = The Invisible framework class
 # If Camping is a micro-framwork at 4K then Invisible is a pico-framework of 2K.
 # Half the size mainly because of Rack. Many ideas were borrowed from Sinatra,
@@ -99,6 +99,11 @@ class Invisible
     @response.body = @content
   end
   
+  # Redirect to a path
+  def redirect_to(path)
+    render(:status => 302, "Location" => path) { p { text("You are redirected to "); a(path, :href => path) } }
+  end
+  
   # Register a layout to be used around +render+ed text.
   # Use markaby inside your block.
   def layout(name=:default, &block)
@@ -137,8 +142,8 @@ class Invisible
     def _call(env)
       @request  = Rack::Request.new(env)
       @response = Rack::Response.new
-      @params   = @request.params
-      if action = recognize(env["PATH_INFO"], @params["_method"] || env["REQUEST_METHOD"])
+      @params   = @request.params.symbolize_keys
+      if action = recognize(env["PATH_INFO"], @params[:_method] || env["REQUEST_METHOD"])
         @params.merge!(@path_params)
         instance_eval(&action.last)
         @response.finish
@@ -162,6 +167,6 @@ class Invisible
     def match_route(pattern, keys, url)
       matches, params = (url.match(pattern) || return)[1..-1], {}
       keys.each_with_index { |key, i| params[key] = matches[i] }
-      params
+      params.symbolize_keys
     end
 end

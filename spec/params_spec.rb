@@ -13,10 +13,10 @@ describe "params" do
   end
   
   it "should include request params" do
-    @app.mock.get("/?oh=aie").body.should == { 'oh' => 'aie' }.inspect
+    @app.mock.get("/?oh=aie").body.should == { :oh => 'aie' }.inspect
   end
 
   it "should include path params" do
-    @app.mock.get("/oh").body.should == { 'path' => 'oh' }.inspect
+    @app.mock.get("/oh").body.should == { :path => 'oh' }.inspect
   end
 end
