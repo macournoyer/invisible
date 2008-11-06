@@ -35,13 +35,16 @@
 # 
 class Invisible
   HTTP_METHODS = [:get, :post, :head, :put, :delete]
-  attr_reader :actions, :request, :response, :params
+  attr_reader :actions, :request, :response, :params, :root
   
   # Creates a new Invisible Rack application. You can build your app
   # in the yielded block or using the app instance.
   def initialize(&block)
-    @actions, @with, @layouts, @views, @helpers, @app = [], [], {}, {}, self, method(:_call)
-    instance_eval(&block) if block
+    raise ArgumentError, "block required" unless block
+    @actions, @with, @layouts, @views, @helpers = [], [], {}, {}, self
+    @app  = method(:_call)
+    @root = File.dirname(eval("__FILE__", block.binding))
+    instance_eval(&block)
   end
   
   # Register an action for a specified +route+.
@@ -120,21 +123,14 @@ class Invisible
     @app = middleware.new(@app, *args)
   end
   
-  # Run the application using Thin.
-  # All arguments are passed to Thin::Server.start.
-  def run(*args)
-    require "thin"
-    Thin::Server.start(@app, *args)
-  end
-  
   # Called by the Rack handler to process a request.
   def call(env)
     @app.call(env)
   end
   
-  # Allow to defined and run an application in a single call.
+  # Shortcut to Rack builder +run+ method.
   def self.run(*args, &block)
-    new(&block).run(*args)
+    eval("self", block.binding).run new(&block)
   end
   
   private

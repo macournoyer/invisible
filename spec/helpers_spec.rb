@@ -29,7 +29,7 @@ describe "params" do
   end
   
   it "should not add helper methods to all apps" do
-    app = Invisible.new
+    app = Invisible.new {}
     app.should_not respond_to(:help_me)
   end
 end

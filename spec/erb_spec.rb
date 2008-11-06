@@ -4,7 +4,7 @@ require "invisible/erb"
 describe "erb" do
   before do
     @app = Invisible.new do
-      view_root File.dirname(__FILE__)
+      view_root "."
       
       get "/text" do
         @ohaie = "ivar"
