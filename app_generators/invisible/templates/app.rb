@@ -1,3 +1,7 @@
+layout { erb(:layout) }
+
 get "/" do
-  h1 "This is Invisible"
+  render do
+    h1 "This is Invisible"
+  end
 end

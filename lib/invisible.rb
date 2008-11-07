@@ -35,7 +35,7 @@
 # 
 class Invisible
   HTTP_METHODS = [:get, :post, :head, :put, :delete]
-  attr_reader :actions, :request, :response, :params, :root
+  attr_reader :actions, :request, :response, :params
   
   # Creates a new Invisible Rack application. You can build your app
   # in the yielded block or using the app instance.
@@ -44,6 +44,12 @@ class Invisible
     @app  = method(:_call)
     @root = File.dirname(eval("__FILE__", block.binding))
     instance_eval(&block)
+  end
+  
+  # Set the root of the app.
+  # Defaults to the file the Invisible class is instancianted in.
+  def root(value=@root)
+    @root = value
   end
   
   # Register an action for a specified +route+.

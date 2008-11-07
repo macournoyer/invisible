@@ -1,6 +1,8 @@
 require "erb"
 
 class Invisible
+  include ERB::Util
+  
   def view_root(root)
     @view_root = File.join(@root, root.to_s)
   end

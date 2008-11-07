@@ -18,24 +18,27 @@ class InvisibleGenerator < RubiGen::Base
     record do |m|
       # Root directory and all subdirectories.
       m.directory ''
+      m.directory 'config'
+      m.directory 'config/env'
       m.directory 'public'
       m.directory 'public/stylesheets'
       m.directory 'public/javascripts'
       m.directory 'public/images'
       m.directory 'spec'
       m.directory 'views'
-      m.directory 'config'
-      m.directory 'config/env'
       
       # Default module for app
-      m.template_copy_each %w(app.rb)
+      # m.template_copy_each %w()
       
       # Static files
-      m.file_copy_each %w(views/layout.erb
+      m.file_copy_each %w(Rakefile
+                          app.rb
                           config/boot.ru
                           config/env/production.rb
                           config/env/development.rb
-                          config/env/test.rb)
+                          config/env/test.rb
+                          spec/app_spec.rb
+                          views/layout.erb)
       
       # Scripts
       m.dependency "install_rubigen_scripts", [destination_root, 'invisible'],

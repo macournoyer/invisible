@@ -7,15 +7,17 @@ require "invisible/erb"
 RACK_ENV = ENV["RACK_ENV"] || "development"
 
 Invisible.run do
-  puts "Booting #{RACK_ENV} environment"
-  load "env/#{RACK_ENV}"
+  root File.dirname(__FILE__) + "/.."
   
-  load "../app"
+  puts "Booting #{RACK_ENV} environment"
+  load "config/env/#{RACK_ENV}"
+  
+  load "app"
   
   # For session support
   use Rack::Session::Cookie
   
   # To serve static files
   use Rack::Static, :urls => %w(/stylesheets /javascripts /images),
-                    :root => File.dirname(__FILE__) + "/public"
+                    :root => root + "/public"
 end
