@@ -42,8 +42,8 @@ class Invisible
   def initialize(&block)
     raise ArgumentError, "block required" unless block
     @actions, @with, @layouts, @views, @helpers = [], [], {}, {}, self
-    @app  = method(:_call)
-    @root = File.dirname(eval("__FILE__", block.binding))
+    @app    = method(:_call)
+    @root   = File.dirname(eval("__FILE__", block.binding))
     instance_eval(&block)
   end
   
@@ -89,13 +89,12 @@ class Invisible
   #  render "heck", :status => 201, :layout => :none, 'X-Crap-Level' => 'ubersome'
   #
   def render(*args, &block)
-    options = args.last.is_a?(Hash) ? args.pop : {}
+    options  = args.last.is_a?(Hash) ? args.pop : {}
+    layout   = @layouts[options.delete(:layout) || :default]
     @response.status = options.delete(:status) || 200
-    layout  = @layouts[options.delete(:layout) || :default]
-    assigns = { :request => request, :response => response, :params => params, :session => session }
-    @content = args.last.is_a?(String) ? args.last : Markaby::Builder.new(assigns, self, &(block || @views[args.last])).to_s
-    @content = Markaby::Builder.new(assigns, self, &layout).to_s if layout
     @response.headers.merge!(options)
+    @content = args.last.is_a?(String) ? args.last : Markaby::Builder.new({}, self, &(block || @views[args.last])).to_s
+    @content = Markaby::Builder.new({}, self, &layout).to_s if layout
     @response.body = @content
   end
   
