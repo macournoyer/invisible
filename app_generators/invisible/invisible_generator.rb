@@ -19,8 +19,8 @@ class InvisibleGenerator < RubiGen::Base
       # Root directory and all subdirectories.
       m.directory ''
       m.directory 'public'
-      m.directory 'public/css'
-      m.directory 'public/js'
+      m.directory 'public/stylesheets'
+      m.directory 'public/javascripts'
       m.directory 'public/images'
       m.directory 'spec'
       m.directory 'views'

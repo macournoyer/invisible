@@ -40,10 +40,9 @@ class Invisible
   # Creates a new Invisible Rack application. You can build your app
   # in the yielded block or using the app instance.
   def initialize(&block)
-    raise ArgumentError, "block required" unless block
-    @actions, @with, @layouts, @views, @helpers = [], [], {}, {}, self
-    @app    = method(:_call)
-    @root   = File.dirname(eval("__FILE__", block.binding))
+    @actions, @with, @loaded, @layouts, @views, @helpers = [], [], [], {}, {}, self
+    @app  = method(:_call)
+    @root = File.dirname(eval("__FILE__", block.binding))
     instance_eval(&block)
   end
   
@@ -99,8 +98,8 @@ class Invisible
   end
   
   # Redirect to a path
-  def redirect_to(path)
-    render(:status => 302, "Location" => path) { p { text("You are redirected to "); a(path, :href => path) } }
+  def redirect_to(path, status=302)
+    render(:status => status, "Location" => path) { p { text("You are redirected to "); a(path, :href => path) } }
   end
   
   # Register a layout to be used around +render+ed text.
@@ -130,6 +129,13 @@ class Invisible
   # Called by the Rack handler to process a request.
   def call(env)
     @app.call(env)
+  end
+  
+  # Load an external file that will be reloaded
+  def load(file)
+    @loaded << file
+    path = File.join(@root, file) + ".rb"
+    eval(File.read(path), binding, path)
   end
   
   # Shortcut to Rack builder +run+ method.

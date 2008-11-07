@@ -16,6 +16,6 @@ Invisible.run do
   use Rack::Session::Cookie
   
   # To serve static files
-  use Rack::Static, :urls => %w(/css /js /images),
+  use Rack::Static, :urls => %w(/stylesheets /javascripts /images),
                     :root => File.dirname(__FILE__) + "/public"
 end
