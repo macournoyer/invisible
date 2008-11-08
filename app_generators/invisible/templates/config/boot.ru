@@ -9,9 +9,7 @@ RACK_ENV = ENV["RACK_ENV"] || "development"
 Invisible.run do
   root File.dirname(__FILE__) + "/.."
   
-  puts "Booting #{RACK_ENV} environment"
   load "config/env/#{RACK_ENV}"
-  
   load "app"
   
   # For session support

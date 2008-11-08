@@ -31,18 +31,22 @@ class InvisibleGenerator < RubiGen::Base
       # m.template_copy_each %w()
       
       # Static files
-      m.file_copy_each %w(Rakefile
-                          app.rb
-                          config/boot.ru
-                          config/env/production.rb
-                          config/env/development.rb
-                          config/env/test.rb
-                          spec/app_spec.rb
-                          views/layout.erb)
+      m.file_copy_each %w( Rakefile
+                           app.rb
+                           config/boot.ru
+                           config/env/production.rb
+                           config/env/development.rb
+                           config/env/test.rb
+                           public/stylesheets/ie.css
+                           public/stylesheets/print.css
+                           public/stylesheets/screen.css
+                           spec/app_spec.rb
+                           views/layout.erb )
       
       # Scripts
       m.dependency "install_rubigen_scripts", [destination_root, 'invisible'],
         :shebang => options[:shebang], :collision => :force
+      m.file 'script/server.rb', 'script/server', :chmod => 0755, :shebang => options[:shebang]
     end
   end
   
