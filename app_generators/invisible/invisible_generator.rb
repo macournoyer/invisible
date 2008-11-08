@@ -20,10 +20,12 @@ class InvisibleGenerator < RubiGen::Base
       m.directory ''
       m.directory 'config'
       m.directory 'config/env'
+      m.directory 'lib'
       m.directory 'public'
       m.directory 'public/stylesheets'
       m.directory 'public/javascripts'
       m.directory 'public/images'
+      m.directory 'script'
       m.directory 'spec'
       m.directory 'views'
       
@@ -33,11 +35,12 @@ class InvisibleGenerator < RubiGen::Base
       # Static files
       m.file_copy_each %w( Rakefile
                            app.rb
-                           config/boot.ru
-                           config/env.rb
+                           config/boot.rb
                            config/env/production.rb
                            config/env/development.rb
                            config/env/test.rb
+                           config/env.rb
+                           config/rack.ru
                            public/stylesheets/ie.css
                            public/stylesheets/print.css
                            public/stylesheets/screen.css

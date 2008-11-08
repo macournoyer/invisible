@@ -1,5 +1,4 @@
-require "rubygems"
-require "invisible"
+require File.dirname(__FILE__) + "/../config/boot"
 require "invisible/mock"
 require "spec"
 

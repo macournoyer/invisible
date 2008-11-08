@@ -1,5 +1,4 @@
-require "rubygems"
-require "invisible"
+require File.dirname(__FILE__) + "/boot"
 
 RACK_ENV = ENV["RACK_ENV"] || "development"
 
