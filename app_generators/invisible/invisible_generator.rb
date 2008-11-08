@@ -34,12 +34,14 @@ class InvisibleGenerator < RubiGen::Base
       m.file_copy_each %w( Rakefile
                            app.rb
                            config/boot.ru
+                           config/env.rb
                            config/env/production.rb
                            config/env/development.rb
                            config/env/test.rb
                            public/stylesheets/ie.css
                            public/stylesheets/print.css
                            public/stylesheets/screen.css
+                           spec/spec_helper.rb
                            spec/app_spec.rb
                            views/layout.erb )
       
