@@ -1,5 +1,6 @@
 # Optional Invisible libs
 require "invisible/erb"
+# require "invisible/erubis" Remove previous if you uncomment this
 # require "invisible/haml"
 
 load "config/env/#{RACK_ENV}"
