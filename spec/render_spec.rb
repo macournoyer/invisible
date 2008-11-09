@@ -53,4 +53,8 @@ describe "render" do
   it "should allow render anywhere" do
     @app.mock.get("/anywhere").body.should == "anywhere"
   end
+  
+  it "should set Content-Length" do
+    @app.mock.get("/text").headers["Content-Length"].should == "4"
+  end
 end

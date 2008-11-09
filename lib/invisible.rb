@@ -94,6 +94,7 @@ class Invisible
     @response.headers.merge!(options)
     @content = args.last.is_a?(String) ? args.last : Markaby::Builder.new({}, self, &(block || @views[args.last])).to_s
     @content = Markaby::Builder.new({}, self, &layout).to_s if layout
+    @response.headers["Content-Length"] ||= @content.size.to_s
     @response.body = @content
   end
   
