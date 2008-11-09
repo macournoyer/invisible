@@ -8,8 +8,13 @@ class Invisible
   # Contains methods to call each HTTP method on @app.
   # 
   #   get("/") # Will call @app.mock.get("/")
+  #   session[:user] # Will call @app.session[:user]
   # 
   module MockMethods
     HTTP_METHODS.each { |m| module_eval "def #{m}(*a); @app.mock.#{m}(*a) end" }
+    
+    # Delegate some request helpers to the app
+    def session; @app.session end
+    def params;  @app.params end
   end
 end

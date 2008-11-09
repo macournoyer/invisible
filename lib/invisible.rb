@@ -143,6 +143,7 @@ class Invisible
   # The files loaded with this method will be reloaded in
   # You're using the Invisible Reloader middleware.
   def load(file)
+    return if @loaded.include?(file)
     @loaded << file
     path = File.join(@root, file) + ".rb"
     eval(File.read(path), binding, path)
