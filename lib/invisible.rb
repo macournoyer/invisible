@@ -184,7 +184,7 @@ class Invisible
     end
     
     def build_route(route)
-      pattern = route.split("/").inject('\/*') { |r, s| r << (s[0] == ?: ? '(\w+)' : s) + '\/*' } + '\/*'
+      pattern = '\/*' + route.gsub("/", '\/*').gsub(/:\w+/, '(\w+)') + '\/*'
       [/^#{pattern}$/i, route.scan(/\:(\w+)/).flatten]
     end
     

@@ -11,8 +11,16 @@ describe "routing" do
         render "/path.xml"
       end
       
+      get "/param/:name.xml" do
+        render params[:name] + ".xml"
+      end
+      
       get "/param/:name" do
         render params[:name]
+      end
+      
+      get "/param_with_underscore/:long_name" do
+        render params[:long_name]
       end
       
       get "no/slash" do
@@ -67,6 +75,14 @@ describe "routing" do
   
   it "should route /param/:param" do
     @app.mock.get("/param/ohaie").body.should == "ohaie"
+  end
+
+  it "should route and set param with underscore" do
+    @app.mock.get("/param_with_underscore/ohaie").body.should == "ohaie"
+  end
+  
+  it "should route /param/:param.xml" do
+    @app.mock.get("/param/ohaie.xml").body.should == "ohaie.xml"
   end
   
   it "should route with no leading slash" do
