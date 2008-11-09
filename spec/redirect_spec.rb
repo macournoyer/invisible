@@ -12,6 +12,7 @@ describe "redirect" do
   it "should redirect to path" do
     response = @app.mock.get("/redirect")
     response.status.should == 302
+    response.location.should == "/"
     response.body.should == "<p>You are redirected to <a href=\"/\">/</a></p>"
   end
 end

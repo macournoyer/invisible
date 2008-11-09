@@ -1,4 +1,4 @@
-%w(rubygems rack markaby invisible/core_ext).each { |f| require f }
+%w(rubygems time rack markaby invisible/core_ext).each { |f| require f }
 # = The Invisible Framework
 # Invisible is like a giant robot combining the awesomeness of Rails,
 # Merb, Camping and Sinatra. Except, it's tiny (100 sloc).
@@ -89,12 +89,19 @@ class Invisible
   # All other options will be sent as a response header.
   def render(*args, &block)
     options  = args.last.is_a?(Hash) ? args.pop : {}
+    
+    # Extract options
     layout   = @layouts[options.delete(:layout) || :default]
     @response.status = options.delete(:status) || 200
-    @response.headers.merge!(options)
+    
+    # Render inside the layout
     @content = args.last.is_a?(String) ? args.last : Markaby::Builder.new({}, self, &(block || @views[args.last])).to_s
     @content = Markaby::Builder.new({}, self, &layout).to_s if layout
+    
+    # Set headers
+    @response.headers.merge!(options)
     @response.headers["Content-Length"] ||= @content.size.to_s
+    @response.headers["Last-Modified"]  ||= Time.now.httpdate
     @response.body = @content
   end
   
@@ -167,7 +174,7 @@ class Invisible
       @request  = Rack::Request.new(env)
       @response = Rack::Response.new
       @params   = @request.params.symbolize_keys
-      if action = recognize(env["PATH_INFO"], @params[:_method] || env["REQUEST_METHOD"])
+      if action = recognize(@request.path_info, @request.POST["_method"] || @request.request_method)
         @params.merge!(@path_params)
         instance_eval(&action.last)
         @response.finish

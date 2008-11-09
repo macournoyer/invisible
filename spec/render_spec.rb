@@ -57,4 +57,8 @@ describe "render" do
   it "should set Content-Length" do
     @app.mock.get("/text").headers["Content-Length"].should == "4"
   end
+
+  it "should set Last-Modified" do
+    @app.mock.get("/text").headers["Last-Modified"].should_not be_nil
+  end
 end
