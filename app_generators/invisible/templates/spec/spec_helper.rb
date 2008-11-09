@@ -1,8 +1,7 @@
+ENV["RACK_ENV"] = "test"
 require File.dirname(__FILE__) + "/../config/boot"
 require "invisible/mock"
 require "spec"
-
-RACK_ENV = "test"
 
 Spec::Runner.configure do |config|
   config.prepend_before do
