@@ -177,10 +177,11 @@ class Invisible
       if action = recognize(@request.path_info, @request.POST["_method"] || @request.request_method)
         @params.merge!(@path_params)
         instance_eval(&action.last)
-        @response.finish
       else
-        [404, {}, "Not found"]
+        @response.status = 404
+        @response.body   = "Not found"
       end
+      @response.finish
     end
     
     def build_route(route)

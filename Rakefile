@@ -1,5 +1,3 @@
-require 'rake'
-require 'rake/clean'
 require 'spec/rake/spectask'
 
 Spec::Rake::SpecTask.new do |t|

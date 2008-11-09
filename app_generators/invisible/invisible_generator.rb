@@ -49,7 +49,7 @@ class InvisibleGenerator < RubiGen::Base
                            views/layout.erb )
       
       # Scripts
-      m.dependency "install_rubigen_scripts", [destination_root, 'invisible'],
+      m.dependency "install_rubigen_scripts", [destination_root, "rspec"],
         :shebang => options[:shebang], :collision => :force
       m.file 'script/server.rb', 'script/server', :chmod => 0755, :shebang => options[:shebang]
     end
