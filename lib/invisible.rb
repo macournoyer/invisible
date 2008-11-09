@@ -1,37 +1,21 @@
 %w(rubygems rack markaby invisible/core_ext).each { |f| require f }
-# = The Invisible framework class
-# If Camping is a micro-framwork at 4K then Invisible is a pico-framework of 2K.
-# Half the size mainly because of Rack. Many ideas were borrowed from Sinatra,
-# but with a few more opinions on my own and a strong emphasis on compactness.
-#
+# = The Invisible Framework
+# Invisible is like a giant robot combining the awesomeness of Rails,
+# Merb, Camping and Sinatra. Except, it's tiny (100 sloc).
+# 
 # == Build an app in an object
 # Invisible supports multiple applications running in the same VM. Each instance
 # of this class represents a runnable application.
 #
-#  app = Invisible.new do
-#    get "/" do
-#      render "ohaie"
-#    end
-#  end
-#
-# == Build an app in a file
-# DSL like Sinatra is also supported, put all your `get`, `post`, `layout` in your
-# naked file and Invisible will do the method_missing magic for you.
-#
-# == Your app is a Rack config file (or not)
-# Often the problem with new frameworks is you have to find how to deploy it.
-# You either can make your app file standalone and runnable on its own, put this
-# at the end of your file:
+#   app = Invisible.new do
+#     get "/" do
+#       render "ohaie"
+#     end
+#   end
 # 
-#  app.run
+# You can then run it as a Rack application.
 # 
-# Or to use as a Rack config file, switch the 2 and remove the dot
-# 
-#  run app
-# 
-# Then you'll be able to run with Thin:
-# 
-#  thin start -R app.ru
+#   run app
 # 
 class Invisible
   HTTP_METHODS = [:get, :post, :head, :put, :delete]
@@ -40,8 +24,7 @@ class Invisible
   # Creates a new Invisible Rack application. You can build your app
   # in the yielded block or using the app instance.
   def initialize(&block)
-    @actions, @with, @loaded, @layouts, @views, @helpers = [], [], [], {}, {}, self
-    @app  = method(:_call)
+    @actions, @with, @loaded, @layouts, @views, @helpers, @app = [], [], [], {}, {}, self, method(:_call)
     @root = File.dirname(eval("__FILE__", block.binding))
     instance_eval(&block)
   end
@@ -80,19 +63,30 @@ class Invisible
   # Render the response inside an action.
   # Render markaby by passing a block:
   #
-  #  render do
-  #    h1 "Poop"
-  #    p "Smells!"
-  #  end
+  #   render do
+  #     h1 "Poop"
+  #     p "Smells!"
+  #   end
   # 
-  # or simple text as the first argument.
+  # or simple text as the first argument:
   # 
-  #  render "crap"
+  #   render "crap"
+  # 
+  # or render a markaby view, created using the +view+ method:
+  # 
+  #   view :lolcat do
+  #     p "i can has?"
+  #   end
+  #   render :lolcat
+  # 
+  # You can also pass some options or headers:
+  # 
+  #   render "heck", :status => 201, :layout => :none, 'X-Crap-Level' => 'ubersome'
   #
-  # You can also pass some option or headers:
-  #
-  #  render "heck", :status => 201, :layout => :none, 'X-Crap-Level' => 'ubersome'
-  #
+  # Supported options are:
+  # status: Status code of the response.
+  # layout: Name of the layout to use.
+  # All other options will be sent as a response header.
   def render(*args, &block)
     options  = args.last.is_a?(Hash) ? args.pop : {}
     layout   = @layouts[options.delete(:layout) || :default]
@@ -103,7 +97,14 @@ class Invisible
     @response.body = @content
   end
   
-  # Redirect to a path
+  # Redirect to a path.
+  # 
+  #   redirect_to "/login"
+  # 
+  # To do a permanent redirect, specify the status code as the last argument.
+  # 
+  #   redirect_to "/", 301
+  # 
   def redirect_to(path, status=302)
     render(:status => status, "Location" => path) { p { text("You are redirected to "); a(path, :href => path) } }
   end
@@ -137,7 +138,10 @@ class Invisible
     @app.call(env)
   end
   
-  # Load an external file that will be reloaded
+  # Load an external file inside the context of Invisible,
+  # which means you can use the get,post,with methods.
+  # The files loaded with this method will be reloaded in
+  # You're using the Invisible Reloader middleware.
   def load(file)
     @loaded << file
     path = File.join(@root, file) + ".rb"
@@ -145,6 +149,13 @@ class Invisible
   end
   
   # Shortcut to Rack builder +run+ method.
+  # Equivalent to:
+  # 
+  # app = Invisible.new do
+  #   ...
+  # end
+  # run app
+  # 
   def self.run(*args, &block)
     eval("self", block.binding).run new(&block)
   end
