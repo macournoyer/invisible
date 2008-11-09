@@ -1,4 +1,6 @@
 class Invisible
+  # Reloader all the code loaded using the Invisible#load method.
+  # Use with the Reloader middleware.
   def reload!
     loaded = @loaded
     @loaded = []

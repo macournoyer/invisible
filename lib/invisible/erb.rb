@@ -3,13 +3,14 @@ require "erb"
 class Invisible
   include ERB::Util
   
-  def view_root(root)
-    @view_root = File.join(@root, root.to_s)
-  end
-  
+  # Evaluate the ERB template in +file+ and returns the
+  # result as a string.
+  # Use with +render+:
+  # 
+  #   render erb(:muffin)
+  # 
   def erb(file)
-    view_root "views" unless @view_root
-    path = File.join(@view_root, file.to_s)
+    path = File.join(@root, "views", file.to_s)
     ERB.new(File.read("#{path}.erb")).result(binding)
   end
 end
