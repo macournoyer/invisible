@@ -38,6 +38,10 @@ describe "routing" do
       delete "/" do
         render "delete"
       end
+      
+      get "/wildcard*" do
+        render "wildcard"
+      end
     end
   end
   
@@ -91,5 +95,9 @@ describe "routing" do
   
   it "should route ignore trailing slash" do
     @app.mock.get("/no/slash/").body.should == "no-slash"
+  end
+  
+  it "should allow wildcard in route" do
+    @app.mock.get("/wildcard/something/else").body.should == "wildcard"
   end
 end

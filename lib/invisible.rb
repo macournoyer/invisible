@@ -185,7 +185,7 @@ class Invisible
     end
     
     def build_route(route)
-      pattern = '\/*' + route.gsub("/", '\/*').gsub(/:\w+/, '(\w+)') + '\/*'
+      pattern = '\/*' + route.gsub("*", '.*').gsub("/", '\/*').gsub(/:\w+/, '(\w+)') + '\/*'
       [/^#{pattern}$/i, route.scan(/\:(\w+)/).flatten]
     end
     
