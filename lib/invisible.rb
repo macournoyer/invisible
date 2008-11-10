@@ -1,4 +1,4 @@
-%w(rubygems time rack markaby invisible/core_ext).each { |f| require f }
+%w(rubygems time rack markaby invisible/core_ext invisible/helpers).each { |f| require f }
 # = The Invisible Framework
 # Invisible is like a giant robot combining the awesomeness of Rails,
 # Merb, Camping and Sinatra. Except, it's tiny (100 sloc).
@@ -95,8 +95,8 @@ class Invisible
     @response.status = options.delete(:status) || 200
     
     # Render inside the layout
-    @content = args.last.is_a?(String) ? args.last : Markaby::Builder.new({}, self, &(block || @views[args.last])).to_s
-    @content = Markaby::Builder.new({}, self, &layout).to_s if layout
+    @content = args.last.is_a?(String) ? args.last : mab(&(block || @views[args.last]))
+    @content = mab(&layout).to_s if layout
     
     # Set headers
     @response.headers.merge!(options)
@@ -127,6 +127,11 @@ class Invisible
   # Use markaby inside your block.
   def view(name, &block)
     @views[name] = block
+  end
+  
+  # Return HTML rendered by evaluating the block using Markaby.
+  def mab(&block)
+    Markaby::Builder.new({}, self, &block).to_s
   end
   
   # Return the current session.

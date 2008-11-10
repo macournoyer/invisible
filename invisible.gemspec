@@ -15,6 +15,6 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README"]
   
   # Dependencies
-  s.add_dependency("rack",    ["> 0.4.0"])
-  s.add_dependency("markaby", ["> 0.5"])
+  s.add_dependency("rack",    [">= 0.4.0"])
+  s.add_dependency("markaby", [">= 0.5"])
 end

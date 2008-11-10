@@ -16,6 +16,12 @@ describe "params" do
           help_me
         end
       end
+      
+      get "/link_to" do
+        render do
+          link_to "ohaie", "/"
+        end
+      end
     end
   end
   
@@ -31,5 +37,9 @@ describe "params" do
   it "should not add helper methods to all apps" do
     app = Invisible.new {}
     app.should_not respond_to(:help_me)
+  end
+  
+  it "should use link_to helper in markaby" do
+    @app.mock.get("/link_to").body.should == '<a href="/">ohaie</a>'
   end
 end
