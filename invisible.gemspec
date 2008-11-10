@@ -17,4 +17,9 @@ Gem::Specification.new do |s|
   # Dependencies
   s.add_dependency("rack",    [">= 0.4.0"])
   s.add_dependency("markaby", [">= 0.5"])
+  
+  # Binary
+	s.bindir = "bin"
+	s.default_executable = "invisible"
+	s.executables = "invisible"
 end
