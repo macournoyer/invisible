@@ -1,4 +1,5 @@
-require 'spec/rake/spectask'
+require "spec/rake/spectask"
+require "yaml"
 
 Spec::Rake::SpecTask.new do |t|
   t.spec_opts = %w(-fs -c)
@@ -25,5 +26,39 @@ namespace :site do
   task :upload => :build do
     sh %{scp -rq tmp/site/* macournoyer@code.macournoyer.com:code.macournoyer.com/invisible}
     upload 'tmp/site/*', 'invisible'
+  end
+end
+
+
+gemspec = Gem::Specification.new do |s|
+  s.name        = "invisible"
+  s.version     = "0.0.1"
+  s.date        = Time.today.strftime("%Y-%m-%d")
+  s.summary     = "The Invisible Web Framework"
+  s.email       = "macournoyer@gmail.com"
+  s.homepage    = "http://github.com/macournoyer/invisible"
+  s.description = "Invisible is like a giant robot combining the awesomeness of Rails, Merb, Camping and Sinatra. Except, it's tiny (100 sloc)."
+  s.authors     = ["Marc-Andre Cournoyer"]
+  s.files       = %w(README Rakefile invisible.gemspec) + Dir["{bin,lib,app_generators}/**/*"]
+  
+  # RDoc
+  s.has_rdoc         = true
+  s.rdoc_options     = ["--main", "README"]
+  s.extra_rdoc_files = ["README"]
+  
+  # Dependencies
+  s.add_dependency    "rack",    ">= 0.4.0"
+  s.add_dependency    "markaby", ">= 0.5"
+  
+  # Binary
+  s.bindir             = "bin"
+  s.default_executable = "invisible"
+  s.executables        = "invisible"
+end
+
+namespace :gem do
+  desc "Update the gemspec for GitHub's gem server"
+  task :github do
+    File.open("invisible.gemspec", 'w') { |f| f << YAML.dump(gemspec) }
   end
 end
