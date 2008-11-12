@@ -1,0 +1,5 @@
+- Add default action when loading template engine.
+  So allow only 1 template engine at the time.
+  default layout to layout { erb(:layout) }
+- Have something like assigns(:var) in tests
+- Add generator for Test::Unit
