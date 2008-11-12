@@ -1,0 +1,10 @@
+Example
+=======
+
+Run with Thin:
+
+  thin start -R config/rack.ru
+
+Or Rack rackup command, using Mongrel:
+
+  rackup config/rack.ru

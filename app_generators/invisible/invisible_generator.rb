@@ -30,7 +30,7 @@ class InvisibleGenerator < RubiGen::Base
       m.directory 'views'
       
       # Default module for app
-      # m.template_copy_each %w()
+      m.template_copy_each %w( README )
       
       # Static files
       m.file_copy_each %w( Rakefile
@@ -47,11 +47,6 @@ class InvisibleGenerator < RubiGen::Base
                            spec/spec_helper.rb
                            spec/app_spec.rb
                            views/layout.erb )
-      
-      # Scripts
-      m.dependency "install_rubigen_scripts", [destination_root, "rspec"],
-        :shebang => options[:shebang], :collision => :force
-      m.file 'script/server.rb', 'script/server', :chmod => 0755, :shebang => options[:shebang]
     end
   end
   
