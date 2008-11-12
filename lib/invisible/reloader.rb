@@ -5,7 +5,6 @@ class Invisible
     loaded = @loaded.uniq
     @loaded = []
     [@actions, @with, @layouts, @views].each { |c| c.clear }
-    @app = method(:_call)
     loaded.each { |f| load(f) }
   end
   

@@ -3,7 +3,7 @@ require "invisible/erb"
 # require "invisible/erubis" Remove previous if you uncomment this
 # require "invisible/haml"
 
-load "config/env/#{RACK_ENV}"
+load "config/env/#{RACK_ENV}", :reload => false
 
 # If you want to split your app in several files,
 # load all the files here.

@@ -8,4 +8,11 @@ source = RubiGen::PathSource.new(:application,
   File.join(File.dirname(__FILE__), "../app_generators"))
 RubiGen::Base.reset_sources
 RubiGen::Base.append_sources source
-RubiGen::Scripts::Generate.new.run(ARGV, :generator => 'invisible')
+
+if ARGV.delete("--flat")
+  generator = "flat"
+else
+  generator = "full"
+end
+
+RubiGen::Scripts::Generate.new.run(ARGV, :generator => generator)

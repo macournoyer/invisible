@@ -155,9 +155,12 @@ class Invisible
   # which means you can use the get,post,with methods.
   # The files loaded with this method will be reloaded in
   # You're using the Invisible Reloader middleware.
-  def load(file)
+  # Options:
+  # reload: false to not reload the file when Reloader middleware is in use.
+  #         (default: true)
+  def load(file, options={})
     return if @loaded.include?(file)
-    @loaded << file
+    @loaded << file unless FalseClass === options[:reload]
     path = File.join(@root, file) + ".rb"
     eval(File.read(path), binding, path)
   end

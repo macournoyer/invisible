@@ -1,0 +1,10 @@
+<%= name.titleize %>
+<%= "=" * name.titleize.size %>
+
+Run with Thin:
+
+  thin start -R rack.ru
+
+Or Rack rackup command, using Mongrel (by default):
+
+  rackup rack.ru

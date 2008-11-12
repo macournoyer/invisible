@@ -1,4 +1,4 @@
-class InvisibleGenerator < RubiGen::Base
+class FullGenerator < RubiGen::Base
   attr_reader :name
   
   def initialize(runtime_args, runtime_options = {})
@@ -22,7 +22,7 @@ class InvisibleGenerator < RubiGen::Base
       m.directory 'public/images'
       m.directory 'views'
       
-      # Default module for app
+      # Templates
       m.template_copy_each %w( README Rakefile )
       
       # Static files
@@ -59,15 +59,16 @@ class InvisibleGenerator < RubiGen::Base
       <<-EOS
 Creates a new Invisible app.
 
-USAGE: #{spec.name} name
+USAGE: invisible my_app [options]
 EOS
     end
     
     def add_options!(opts)
       opts.separator ''
       opts.separator 'Options:'
-      opts.on("-S", "--rspec",   "Use RSpec for testing (default to Test::Unit)") { |options[:rspec]| }
-      opts.on("-g", "--git",     "Add Git stuff (default: true)") { |options[:git]| }
+      opts.on("-S", "--rspec",  "Use RSpec for testing (default to Test::Unit)") { |options[:rspec]| }
+      opts.on("-g", "--git",    "Add Git stuff (default: true)") { |options[:git]| }
+      opts.on(      "--flat",   "Generate just the bare minimum files to run")
     end
     
     def extract_options
