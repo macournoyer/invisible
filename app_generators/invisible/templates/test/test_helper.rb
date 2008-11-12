@@ -1,7 +1,7 @@
 ENV["RACK_ENV"] = "test"
 require File.dirname(__FILE__) + "/../config/boot"
 require "invisible/mock"
-require "spec"
+require "test/unit"
 
 class Test::Unit::TestCase
   include Invisible::MockMethods

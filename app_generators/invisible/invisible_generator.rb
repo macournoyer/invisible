@@ -45,7 +45,7 @@ class InvisibleGenerator < RubiGen::Base
       else # Test::Unit
         m.directory 'test'
         m.file_copy_each %w( test/test_helper.rb
-                             test/test_spec.rb )
+                             test/app_test.rb )
       end
       
       if options[:git]
