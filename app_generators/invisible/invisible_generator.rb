@@ -1,9 +1,4 @@
 class InvisibleGenerator < RubiGen::Base
-  
-  DEFAULT_SHEBANG = File.join(Config::CONFIG['bindir'],
-                              Config::CONFIG['ruby_install_name'])
-  
-  
   attr_reader :name
   
   def initialize(runtime_args, runtime_options = {})
@@ -25,16 +20,13 @@ class InvisibleGenerator < RubiGen::Base
       m.directory 'public/stylesheets'
       m.directory 'public/javascripts'
       m.directory 'public/images'
-      m.directory 'script'
-      m.directory 'spec'
       m.directory 'views'
       
       # Default module for app
-      m.template_copy_each %w( README )
+      m.template_copy_each %w( README Rakefile )
       
       # Static files
-      m.file_copy_each %w( Rakefile
-                           app.rb
+      m.file_copy_each %w( app.rb
                            config/boot.rb
                            config/env/production.rb
                            config/env/development.rb
@@ -44,9 +36,21 @@ class InvisibleGenerator < RubiGen::Base
                            public/stylesheets/ie.css
                            public/stylesheets/print.css
                            public/stylesheets/screen.css
-                           spec/spec_helper.rb
-                           spec/app_spec.rb
                            views/layout.erb )
+      
+      if options[:rspec]
+        m.directory 'spec'
+        m.file_copy_each %w( spec/spec_helper.rb
+                             spec/app_spec.rb )
+      else # Test::Unit
+        m.directory 'test'
+        m.file_copy_each %w( test/test_helper.rb
+                             test/test_spec.rb )
+      end
+      
+      if options[:git]
+        m.file "gitignore", ".gitignore"
+      end
     end
   end
   
@@ -62,14 +66,10 @@ EOS
     def add_options!(opts)
       opts.separator ''
       opts.separator 'Options:'
-      # For each option below, place the default
-      # at the top of the file next to "default_options"
-      # opts.on("-a", "--author=\"Your Name\"", String,
-      #         "Some comment about this option",
-      #         "Default: none") { |options[:author]| }
-      opts.on("-v", "--version", "Show the #{File.basename($0)} version number and quit.")
+      opts.on("-S", "--rspec",   "Use RSpec for testing (default to Test::Unit)") { |options[:rspec]| }
+      opts.on("-g", "--git",     "Add Git stuff (default: true)") { |options[:git]| }
     end
-
+    
     def extract_options
       # for each option, extract it into a local variable (and create an "attr_reader :author" at the top)
       # Templates can access these value via the attr_reader-generated methods, but not the
