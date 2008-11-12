@@ -1,6 +1,4 @@
-
-          ~= THE INVISIBLE FRAMEWORK =~          
-
+= THE INVISIBLE FRAMEWORK
 Invisible is like a giant robot combining the
 awesomeness of Rails, Merb, Camping and Sinatra.
 Except, it's tiny (100 sloc).
@@ -12,8 +10,53 @@ Get started today!
 
   invisible my_lil_app
   cd my_lil_app
-  script/server
+  thin start config/rack.ru
   edit app.rb
+
+Or, if you're really into tiny things:
+
+  invisible my_very_lil_app --flat
+
+== Build web apps in just a few lines
+The app syntax looks a lot like Sinatra:
+
+  get "/session/:value" do
+    session[:invisible] = params[:value]
+    render do
+      h2 "I added this to the session for you:"
+      pre params[:value].inspect
+      p { a "Go back", :href => "/" }
+    end
+  end
+
+You can also render ERB, eRubis and Haml templates.
+
+== TATFT (aka Test all the fucking time)
+Invisible also comes with support for easy
+testing, using Test::Unit or RSpec.
+
+  def test_should_get_root
+    assert get("/").ok?
+  end
+  
+  it "should get /" do
+    get("/").should be_ok
+  end
+
+== The extras you were missing in a micro-framework
+Invisible has:
+* reloading
+* configurable multi-environment support
+* multi-app in the same VM
+* session support (Cookie, Memcache, etc.)
+* a love affair with Rack middlewares
+* another love affair with testing
+* load just what you need approach (low mem)
+* awesomeness builtin, twice!
+* all that under 100 LOC (+ taxes)
+
+I'm like, WOW! What are you waiting for?
+Go build the next Twitter now, mkay?
 
 Ruby License, http://ruby-lang.org/en/LICENSE.txt
 Invisible is copyright Marc-Andre Cournoyer
