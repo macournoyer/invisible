@@ -1,5 +1,8 @@
+require "rake/clean"
 require "spec/rake/spectask"
 require "yaml"
+
+CLEAN.include "*.gem"
 
 Spec::Rake::SpecTask.new do |t|
   t.spec_opts = %w(-fs -c)
