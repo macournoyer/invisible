@@ -14,11 +14,24 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   app = Invisible::Application.new do
-    get "/" do
-      response.write "ohaie"
+    get do
+      response.write "root"
     end
-    get "/echo/:this" do
-      response.write params[:this]
+    
+    resource "ohaie" do
+      get do
+        response.write "ohaie"
+      end
+      
+      get "lol" do
+        response.write "ohaie/lol"
+      end
+      
+      resource "there" do
+        get do
+          response.write "ohaie/there"
+        end
+      end
     end
   end
   
