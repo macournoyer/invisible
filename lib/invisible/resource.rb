@@ -18,28 +18,28 @@ module Invisible
     end
     
     class << self
-      attr_accessor :uri, :methods, :resources
+      attr_accessor :path, :methods, :resources
       
-      def uri;       @uri       ||= "/" end
+      def path;      @path      ||= "/" end
       def methods;   @methods   ||= {}  end
       def resources; @resources ||= []  end
       
-      def get(uri=nil, &block)
-        klass = uri ? resource(uri) : self
+      def get(path=nil, &block)
+        klass = path ? resource(path) : self
         klass.methods["GET"] = klass.new("GET", &block)
       end
       
-      def resource(uri="/", &block)
-        resource_name = classify(uri)
-        uri           = normalize_uri(self.uri + "/" + uri)
+      def resource(path="/", &block)
+        resource_name = classify(path)
+        path          = normalize_path(self.path + "/" + path)
         
         resource = subclass(resource_name) do
-          @uri = uri
+          @path = path
           module_eval(&block) if block
         end
         
         resources << resource
-        resources.sort! { |x,y| x.uri <=> y.uri }.reverse!
+        resources.sort! { |x,y| x.path <=> y.path }.reverse!
         
         resource
       end
@@ -47,21 +47,21 @@ module Invisible
       def call(env)
         request = Rack::Request.new(env)
         
-        if uri == request.path_info && method = methods[request.request_method] # TODO match
+        if self.path == request.path_info && method = methods[request.request_method] # TODO match
           response = method.call(env)
-        elsif resource = resources.detect { |resource| request.path_info.index(resource.uri) }
+        elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
           response = resource.call(env)
         end
         response || Rack::Response.new("Not found", 404).finish
       end
       
       private
-        def normalize_uri(uri)
-          "/" + uri.squeeze("/").gsub(/^\//, "")
+        def normalize_path(path)
+          "/" + path.squeeze("/").gsub(/^\//, "")
         end
         
-        def classify(uri)
-          uri.
+        def classify(path)
+          path.
             squeeze("/").
             gsub(/^\//, "").
             gsub(":", "").
