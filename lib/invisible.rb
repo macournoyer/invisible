@@ -5,11 +5,6 @@ require "markaby"
 
 $:.unshift File.dirname(__FILE__)
 require "invisible/core_ext"
-require "invisible/application"
-require "invisible/rendering"
-require "invisible/action"
-require "invisible/resource"
-require "invisible/context"
 
 module Invisible
   VERSION = [0, 2, 0]
@@ -21,25 +16,25 @@ module Invisible
   end
 end
 
+require "invisible/application"
+require "invisible/rendering"
+require "invisible/action"
+require "invisible/resource"
+require "invisible/context"
+require "invisible/middleware/base"
+require "invisible/middleware/before"
+require "invisible/middleware/layout"
+require "invisible/middleware/content_length"
+
+
 if __FILE__ == $PROGRAM_NAME
-  class Crap
-    def initialize(app)
-      @app = app
-    end
-    
-    def call(env)
-      puts ">>>>> crap!"
-      @app.call(env)
-    end
-  end
-  
   app = Invisible::Application.new do
     get do
       render "root"
     end
     
     resource "ohaie" do
-      use Crap
+      layout :default
       
       get do
         render "ohaie"
@@ -49,7 +44,11 @@ if __FILE__ == $PROGRAM_NAME
         render "ohaie/lol"
       end
       
-      resource "there" do
+      resource "private" do
+        use Rack::Auth::Basic do |user, password|
+          true
+        end
+        
         get do
           render "ohaie/there"
         end

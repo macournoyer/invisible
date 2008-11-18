@@ -6,11 +6,8 @@ module Invisible
       
       # Extract options
       @response.status = options.delete(:status) || 200
-      
-      # Set headers
       @response.headers.merge!(options)
-      @response.headers["Content-Length"] ||= content.size.to_s
-      @response.headers["Last-Modified"]  ||= Time.now.httpdate
+      # @response.headers["Last-Modified"]  ||= Time.now.httpdate
       
       @response.body = content
     end

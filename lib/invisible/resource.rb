@@ -7,11 +7,6 @@ module Invisible
       resource(path, &block)
     end
     
-    def get(path=nil, &block)
-      klass = path ? resource(path) : self
-      klass.methods["GET"] = klass.new("GET", &block)
-    end
-    
     def resource(path="/", &block)
       resource_name = classify(path)
       path          = normalize_path(@path.to_s + "/" + path)
@@ -27,12 +22,29 @@ module Invisible
       resource
     end
     
+    HTTP_METHODS.each do |method|
+      module_eval <<-EOS
+        def #{method}(path=nil, &block)
+          klass = path ? resource(path) : self
+          klass.methods["#{method.to_s.upcase}"] = klass.new("#{method.to_s.upcase}", &block)
+        end
+      EOS
+    end
+    
     def call(env)
       @app.call(env)
     end
     
     def use(middleware, *args, &block)
       @app = middleware.new(@app, *args, &block)
+    end
+    
+    def before(&block)
+      use Middleware::Before, &block
+    end
+    
+    def layout(name)
+      use Middleware::Layout, name
     end
     
     private
@@ -47,24 +59,12 @@ module Invisible
         request = Rack::Request.new(env)
         
         if @path == request.path_info && method = methods[request.request_method] # TODO match
+          env["invisible.context"] = method
           response = method.call(env)
         elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
           response = resource.call(env)
         end
         response || Rack::Response.new("Not found", 404).finish
-      end
-      
-      def match(request)
-        if request.request_method == @method && matches = request.path_info.match(@pattern)
-          path_params = {}
-          @params.each_with_index { |key, i| path_params[key] = matches[i+1] }
-          path_params.symbolize_keys
-        end
-      end
-      
-      def build_route(route)
-        pattern = '\/*' + route.gsub("*", '.*').gsub("/", '\/*').gsub(/:\w+/, '(\w+)') + '\/*'
-        [/^#{pattern}$/i, route.scan(/\:(\w+)/).flatten]
       end
       
       def normalize_path(path)
