@@ -3,11 +3,22 @@ require "time"
 require "rack"
 require "markaby"
 
+$:.unshift File.dirname(__FILE__)
 require "invisible/core_ext"
 require "invisible/application"
+require "invisible/rendering"
+require "invisible/action"
+require "invisible/resource"
+require "invisible/context"
 
 module Invisible
   VERSION = [0, 2, 0]
+  
+  HTTP_METHODS = [:get, :post, :put, :delete]
+  
+  def self.new(&block)
+    Application.new(&block)
+  end
 end
 
 if __FILE__ == $PROGRAM_NAME
@@ -24,23 +35,23 @@ if __FILE__ == $PROGRAM_NAME
   
   app = Invisible::Application.new do
     get do
-      response.write "root"
+      render "root"
     end
     
     resource "ohaie" do
       use Crap
       
       get do
-        response.write "ohaie"
+        render "ohaie"
       end
       
       get "lol" do
-        response.write "ohaie/lol"
+        render "ohaie/lol"
       end
       
       resource "there" do
         get do
-          response.write "ohaie/there"
+          render "ohaie/there"
         end
       end
     end

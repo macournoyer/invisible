@@ -1,5 +1,4 @@
 require "forwardable"
-require "invisible/context"
 
 module Invisible
   class Application

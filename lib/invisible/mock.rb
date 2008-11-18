@@ -1,8 +1,10 @@
-class Invisible
-  # Return a mocked request for the app.
-  # See: http://rack.rubyforge.org/doc/classes/Rack/MockRequest.html
-  def mock
-    @mock ||= Rack::MockRequest.new(@app)
+module Invisible
+  class Application
+    # Return a mocked request for the app.
+    # See: http://rack.rubyforge.org/doc/classes/Rack/MockRequest.html
+    def mock
+      @mock ||= Rack::MockRequest.new(self)
+    end
   end
   
   # Contains methods to call each HTTP method on @app.

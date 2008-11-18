@@ -1,5 +1,7 @@
 module Invisible
   module Action
+    include Rendering
+    
     attr_reader :method, :request, :response, :params
     
     def initialize(method, &block)

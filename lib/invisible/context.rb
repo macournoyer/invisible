@@ -1,6 +1,3 @@
-require "invisible/action"
-require "invisible/resource"
-
 module Invisible
   class Context
     include Action
