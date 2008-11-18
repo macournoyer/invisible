@@ -20,11 +20,9 @@ module Invisible
     class << self
       attr_accessor :app, :path, :methods, :resources
       
-      def initialize(path)
-        @app       = method(:middleware_less_call)
-        @path      = path
-        @methods   = {}
-        @resources = []
+      def create(path, &block)
+        init(path)
+        resource(path, &block)
       end
       
       def get(path=nil, &block)
@@ -37,7 +35,7 @@ module Invisible
         path          = normalize_path(@path.to_s + "/" + path)
         
         resource = subclass(resource_name) do
-          initialize(path)
+          init(path)
           module_eval(&block) if block
         end
         
@@ -56,7 +54,14 @@ module Invisible
       end
       
       private
-        def middleware_less_call(env)
+        def init(path)
+          @app       = method(:call_app)
+          @path      = path
+          @methods   = {}
+          @resources = []
+        end
+        
+        def call_app(env)
           request = Rack::Request.new(env)
           
           if @path == request.path_info && method = methods[request.request_method] # TODO match
@@ -82,7 +87,5 @@ module Invisible
             gsub(/^$/, "Root")
         end
     end
-    
-    initialize("/")
   end
 end

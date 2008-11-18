@@ -7,7 +7,7 @@ module Invisible
     def_delegators :@resource, :call
     
     def initialize(&block)
-      @resource = Resource.resource("/", &block)
+      @resource = Resource.create("/", &block)
     end
   end
 end
