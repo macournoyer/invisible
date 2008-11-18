@@ -18,11 +18,14 @@ module Invisible
     end
     
     class << self
-      attr_accessor :path, :methods, :resources
+      attr_accessor :app, :path, :methods, :resources
       
-      def path;      @path      ||= "/" end
-      def methods;   @methods   ||= {}  end
-      def resources; @resources ||= []  end
+      def initialize(path)
+        @app       = method(:middleware_less_call)
+        @path      = path
+        @methods   = {}
+        @resources = []
+      end
       
       def get(path=nil, &block)
         klass = path ? resource(path) : self
@@ -31,31 +34,39 @@ module Invisible
       
       def resource(path="/", &block)
         resource_name = classify(path)
-        path          = normalize_path(self.path + "/" + path)
+        path          = normalize_path(@path.to_s + "/" + path)
         
         resource = subclass(resource_name) do
-          @path = path
+          initialize(path)
           module_eval(&block) if block
         end
         
-        resources << resource
-        resources.sort! { |x,y| x.path <=> y.path }.reverse!
+        @resources << resource
+        @resources.sort! { |x,y| x.path <=> y.path }.reverse!
         
         resource
       end
       
       def call(env)
-        request = Rack::Request.new(env)
-        
-        if self.path == request.path_info && method = methods[request.request_method] # TODO match
-          response = method.call(env)
-        elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
-          response = resource.call(env)
-        end
-        response || Rack::Response.new("Not found", 404).finish
+        @app.call(env)
+      end
+      
+      def use(middleware, *args, &block)
+        @app = middleware.new(@app, *args, &block)
       end
       
       private
+        def middleware_less_call(env)
+          request = Rack::Request.new(env)
+          
+          if @path == request.path_info && method = methods[request.request_method] # TODO match
+            response = method.call(env)
+          elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
+            response = resource.call(env)
+          end
+          response || Rack::Response.new("Not found", 404).finish
+        end
+        
         def normalize_path(path)
           "/" + path.squeeze("/").gsub(/^\//, "")
         end
@@ -71,5 +82,7 @@ module Invisible
             gsub(/^$/, "Root")
         end
     end
+    
+    initialize("/")
   end
 end
