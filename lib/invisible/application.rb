@@ -1,4 +1,5 @@
 require "forwardable"
+require "invisible/context"
 
 module Invisible
   class Application
@@ -7,7 +8,7 @@ module Invisible
     def_delegators :@resource, :call
     
     def initialize(&block)
-      @resource = Resource.create("/", &block)
+      @resource = Context.create("/", &block)
     end
   end
 end

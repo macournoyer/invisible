@@ -5,8 +5,6 @@ require "markaby"
 
 require "invisible/core_ext"
 require "invisible/application"
-require "invisible/action"
-require "invisible/resource"
 
 module Invisible
   VERSION = [0, 2, 0]
