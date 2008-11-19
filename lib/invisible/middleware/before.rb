@@ -7,9 +7,9 @@ module Invisible
       end
       
       def call(env)
-        if context = env["invisible.context"]
-          context.instance_eval(&@block)
-        end
+        request = Request.new(env)
+        
+        request.context.instance_eval(&@block) if request.context
         
         @app.call(env)
       end

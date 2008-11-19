@@ -4,32 +4,41 @@ require "forwardable"
 require "rack"
 require "markaby"
 
-$:.unshift File.dirname(__FILE__)
-require "invisible/core_ext"
+$:.unshift File.expand_path(File.dirname(__FILE__))
 
 module Invisible
   VERSION = [0, 2, 0]
+  
+  def self.version
+    VERSION.join(".")
+  end
   
   HTTP_METHODS = [:get, :post, :put, :delete]
   
   def self.new(&block)
     Application.new(&block)
   end
+  
+  require "invisible/core_ext"
+  require "invisible/middleware"
+  
+  autoload :Action,          "invisible/action"
+  autoload :Application,     "invisible/application"
+  autoload :Context,         "invisible/context"
+  autoload :Pipeline,        "invisible/pipeline"
+  autoload :Rendering,       "invisible/rendering"
+  autoload :Request,         "invisible/request"
+  autoload :Resource,        "invisible/resource"
+  autoload :Response,        "invisible/response"
+  autoload :Routing,         "invisible/routing"
+  
+  module Middleware
+    autoload :Before,        "invisible/middleware/before"
+    autoload :ContentLength, "invisible/middleware/content_length"
+    autoload :Layout,        "invisible/middleware/layout"
+    autoload :Reloader,      "invisible/middleware/reloader"
+  end
 end
-
-require "invisible/application"
-require "invisible/request"
-require "invisible/response"
-require "invisible/rendering"
-require "invisible/action"
-require "invisible/pipeline"
-require "invisible/resource"
-require "invisible/context"
-require "invisible/middleware"
-require "invisible/middleware/before"
-require "invisible/middleware/layout"
-require "invisible/middleware/content_length"
-
 
 if __FILE__ == $PROGRAM_NAME
   app = Invisible.new do
