@@ -1,6 +1,5 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require 'invisible'
-require 'invisible/mock'
 require 'rubygems'
 require 'spec'
 
