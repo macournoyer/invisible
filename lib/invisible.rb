@@ -23,6 +23,7 @@ module Invisible
   autoload :Action,          "invisible/action"
   autoload :Application,     "invisible/application"
   autoload :Context,         "invisible/context"
+  autoload :Middlewares,     "invisible/middlewares"
   autoload :Pipeline,        "invisible/pipeline"
   autoload :Rendering,       "invisible/rendering"
   autoload :Request,         "invisible/request"

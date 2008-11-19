@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
-describe Resource do
+describe Rendering do
   before do
     @app = Application.new do
       get do

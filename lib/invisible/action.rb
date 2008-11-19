@@ -9,13 +9,15 @@ module Invisible
       @block  = block
     end
     
-    def call(env)
+    def prepare(env)
       @request  = Request.new(env)
       @response = Response.new
       @params   = @request.params
-      
+    end
+    
+    def call(env)
+      prepare(env)
       instance_eval(&@block)
-      
       @response.finish
     end
   end

@@ -45,20 +45,13 @@ module Invisible
       
       if @path == request.path_info && action = actions[request.request_method] # TODO match
         request.context = action
+        action.prepare(env)
         response = request.pipeline.apply(action).call(env)
       elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
         response = resource.call(env)
       end
       
       response || Rack::Response.new("Not found", 404).finish
-    end
-    
-    def before(&block)
-      use Middleware::Before, &block
-    end
-    
-    def layout(name)
-      use Middleware::Layout, name
     end
     
     private

@@ -52,5 +52,15 @@ describe Context do
       @context.resources.first.path.should == "/very_long"
       @context.resources.last.path.should == "/s"
     end
+    
+    it "should merge pipelines when called" do
+      @context.pipeline.should_receive(:merge)
+      @context.call("invisible.pipeline" => mock("pipeline"))
+    end
+
+    it "should set pipeline when called" do
+      @context.call(env = {})
+      env.should have_key("invisible.pipeline")
+    end
   end
 end
