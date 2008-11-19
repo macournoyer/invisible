@@ -11,8 +11,9 @@ module Invisible
     
     private
       def install_default_middlewares
-        @context.use Middleware::ContentLength
         @context.use Rack::Lint
+        @context.use Middleware::ContentLength
+        @context.use Middleware::NormalizeBody
       end
   end
 end

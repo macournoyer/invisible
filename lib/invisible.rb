@@ -18,7 +18,6 @@ module Invisible
   end
   
   require "invisible/core_ext"
-  require "invisible/middleware"
   
   autoload :Action,          "invisible/action"
   autoload :Application,     "invisible/application"
@@ -35,6 +34,7 @@ module Invisible
     autoload :Before,        "invisible/middleware/before"
     autoload :ContentLength, "invisible/middleware/content_length"
     autoload :Layout,        "invisible/middleware/layout"
+    autoload :NormalizeBody, "invisible/middleware/normalize_body"
     autoload :Reloader,      "invisible/middleware/reloader"
   end
 end
