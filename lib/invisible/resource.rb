@@ -2,7 +2,7 @@ module Invisible
   module Resource
     extend Forwardable
     
-    attr_accessor :pipeline, :path, :methods, :resources
+    attr_accessor :pipeline, :path, :actions, :resources
     
     def_delegators :pipeline, :use
     
@@ -20,7 +20,7 @@ module Invisible
       end
       
       @resources << resource
-      @resources.sort! { |x,y| x.path <=> y.path }.reverse!
+      @resources.sort! { |x,y| x.path.size <=> y.path.size }.reverse!
       
       resource
     end
@@ -29,7 +29,7 @@ module Invisible
       module_eval <<-EOS
         def #{method}(path=nil, &block)
           klass = path ? resource(path) : self
-          klass.methods["#{method.to_s.upcase}"] = klass.new("#{method.to_s.upcase}", &block)
+          klass.actions["#{method.to_s.upcase}"] = klass.new("#{method.to_s.upcase}", &block)
         end
       EOS
     end
@@ -43,9 +43,9 @@ module Invisible
         request.pipeline = @pipeline
       end
       
-      if @path == request.path_info && method = methods[request.request_method] # TODO match
-        request.context = method
-        response = request.pipeline.apply(method).call(env)
+      if @path == request.path_info && action = actions[request.request_method] # TODO match
+        request.context = action
+        response = request.pipeline.apply(action).call(env)
       elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
         response = resource.call(env)
       end
@@ -65,7 +65,7 @@ module Invisible
       def init(path)
         @pipeline  = Pipeline.new
         @path      = path
-        @methods   = {}
+        @actions   = {}
         @resources = []
       end
       
