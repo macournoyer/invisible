@@ -1,6 +1,10 @@
 module Invisible
   module Resource
-    attr_accessor :app, :path, :methods, :resources
+    extend Forwardable
+    
+    attr_accessor :pipeline, :path, :methods, :resources
+    
+    def_delegators :pipeline, :use
     
     def create(path, &block)
       init(path)
@@ -32,11 +36,14 @@ module Invisible
     end
     
     def call(env)
-      @app.call(env)
-    end
-    
-    def use(middleware, *args, &block)
-      @app = middleware.new(@app, *args, &block)
+      request = Rack::Request.new(env)
+      
+      if @path == request.path_info && method = methods[request.request_method] # TODO match
+        response = @pipeline.apply(method).call(env)
+      elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
+        response = resource.call(env)
+      end
+      response || Rack::Response.new("Not found", 404).finish
     end
     
     def before(&block)
@@ -49,22 +56,10 @@ module Invisible
     
     private
       def init(path)
-        @app       = method(:call_app)
+        @pipeline  = Pipeline.new
         @path      = path
         @methods   = {}
         @resources = []
-      end
-      
-      def call_app(env)
-        request = Rack::Request.new(env)
-        
-        if @path == request.path_info && method = methods[request.request_method] # TODO match
-          env["invisible.context"] = method
-          response = method.call(env)
-        elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
-          response = resource.call(env)
-        end
-        response || Rack::Response.new("Not found", 404).finish
       end
       
       def normalize_path(path)

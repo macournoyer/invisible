@@ -1,5 +1,3 @@
-require "forwardable"
-
 module Invisible
   class Application
     extend Forwardable

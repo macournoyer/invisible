@@ -1,5 +1,6 @@
 require "rubygems"
 require "time"
+require "forwardable"
 require "rack"
 require "markaby"
 
@@ -19,6 +20,7 @@ end
 require "invisible/application"
 require "invisible/rendering"
 require "invisible/action"
+require "invisible/pipeline"
 require "invisible/resource"
 require "invisible/context"
 require "invisible/middleware/base"
@@ -28,13 +30,17 @@ require "invisible/middleware/content_length"
 
 
 if __FILE__ == $PROGRAM_NAME
-  app = Invisible::Application.new do
+  app = Invisible.new do
     get do
       render "root"
     end
     
     resource "ohaie" do
       layout :default
+      
+      before do
+        puts ">> in ohaie"
+      end
       
       get do
         render "ohaie"
