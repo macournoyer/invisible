@@ -10,8 +10,8 @@ module Invisible
     end
     
     def call(env)
-      @request  = Rack::Request.new(env)
-      @response = Rack::Response.new
+      @request  = Request.new(env)
+      @response = Response.new
       @params   = @request.params
       
       instance_eval(&@block)

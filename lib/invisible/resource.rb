@@ -36,13 +36,21 @@ module Invisible
     end
     
     def call(env)
-      request = Rack::Request.new(env)
+      request = Request.new(env)
+      
+      if request.pipeline
+        request.pipeline = @pipeline.merge(request.pipeline)
+      else
+        request.pipeline = @pipeline
+      end
       
       if @path == request.path_info && method = methods[request.request_method] # TODO match
-        response = @pipeline.apply(method).call(env)
+        request.context = method
+        response = request.pipeline.apply(method).call(env)
       elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
         response = resource.call(env)
       end
+      
       response || Rack::Response.new("Not found", 404).finish
     end
     

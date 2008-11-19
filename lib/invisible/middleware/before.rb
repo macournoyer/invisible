@@ -1,6 +1,6 @@
 module Invisible
   module Middleware
-    class Before < Base
+    class Before
       def initialize(app, &block)
         @app   = app
         @block = block

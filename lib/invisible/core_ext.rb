@@ -27,11 +27,4 @@ class Class
     klass.instance_eval(&body) if body
     klass
   end
-
-  private
-    def class_count!
-      @class_count ||= 0
-      @class_count += 1
-      @class_count
-    end
 end

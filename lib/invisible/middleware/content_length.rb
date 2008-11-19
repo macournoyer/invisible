@@ -1,6 +1,10 @@
 module Invisible
   module Middleware
-    class ContentLength < Base
+    class ContentLength
+      def initialize(app)
+        @app = app
+      end
+      
       def call(env)
         status, headers, body = @app.call(env)
 

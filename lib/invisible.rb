@@ -18,12 +18,14 @@ module Invisible
 end
 
 require "invisible/application"
+require "invisible/request"
+require "invisible/response"
 require "invisible/rendering"
 require "invisible/action"
 require "invisible/pipeline"
 require "invisible/resource"
 require "invisible/context"
-require "invisible/middleware/base"
+require "invisible/middleware"
 require "invisible/middleware/before"
 require "invisible/middleware/layout"
 require "invisible/middleware/content_length"
@@ -36,7 +38,7 @@ if __FILE__ == $PROGRAM_NAME
     end
     
     resource "ohaie" do
-      layout :default
+      # layout :default
       
       before do
         puts ">> in ohaie"
@@ -56,7 +58,11 @@ if __FILE__ == $PROGRAM_NAME
         end
         
         get do
-          render "ohaie/there"
+          render "ohaie, this is private!"
+        end
+        
+        get "rly" do
+          render "rly, it is!"
         end
       end
     end

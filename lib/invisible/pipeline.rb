@@ -1,31 +1,25 @@
 module Invisible
   # Middleware pipeline. Used to chain middlewares to any app instance.
-  # NOT threadsafe! Because of <tt>Tail#app</tt>.
   class Pipeline
-    class Tail
-      attr_accessor :app
-      
-      def call(env)
-        @app.call(env)
-      end
-    end
+    attr_reader :middlewares
     
-    def initialize
-      @app = @tail = Tail.new
+    def initialize(middlewares=[])
+      @middlewares = middlewares
     end
     
     def apply(app)
-      @tail.app = app
-      self
+      @middlewares.reverse.each do |middleware, args, block|
+        app = middleware.new(app, *args, &block)
+      end
+      app
     end
     
-    def call(env)
-      env["invisible.context"] = @tail.app
-      @app.call(env)
+    def merge(pipeline)
+      Pipeline.new(pipeline.middlewares + @middlewares)
     end
     
     def use(middleware, *args, &block)
-      @app = middleware.new(@app, *args, &block)
+      @middlewares << [middleware, args, block]
     end
   end
 end
