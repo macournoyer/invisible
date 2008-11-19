@@ -7,5 +7,6 @@ module Invisible
     
     env_attr_accessor :context
     env_attr_accessor :pipeline
+    env_attr_accessor :render_options
   end
 end

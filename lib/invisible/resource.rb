@@ -12,10 +12,9 @@ module Invisible
     end
     
     def resource(path="/", &block)
-      resource_name = classify(path)
-      path          = normalize_path(@path.to_s + "/" + path)
+      path = normalize_path(@path.to_s + "/" + path)
       
-      resource = subclass(resource_name) do
+      resource = subclass("Resource") do
         init(path)
         module_eval(&block) if block
       end
@@ -72,17 +71,6 @@ module Invisible
       
       def normalize_path(path)
         "/" + path.squeeze("/").gsub(/^\//, "")
-      end
-      
-      def classify(path)
-        path.
-          squeeze("/").
-          gsub(/^\//, "").
-          gsub(":", "").
-          gsub("-", "_").
-          gsub(/\/(.?)/) { "_#{$1.upcase}" }.
-          gsub(/(?:^|_)(.)/) { $1.upcase }.
-          gsub(/^$/, "Root")
       end
   end
 end
