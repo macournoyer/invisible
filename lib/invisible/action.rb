@@ -14,6 +14,7 @@ module Invisible
       @response = Response.new
       @params   = @request.params.merge(@request.path_params)
       
+      @request.context = self
       @request.pipeline.apply(self)
     end
     

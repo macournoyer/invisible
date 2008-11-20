@@ -17,6 +17,7 @@ describe Middleware::Before do
         before do
           request.path_info
           response.headers
+          params[:w00t]
         end
         get { }
       end
