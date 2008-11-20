@@ -12,6 +12,7 @@ module Invisible
     private
       def install_default_middlewares
         @context.use Rack::Lint
+        # @context.use Rack::MethodOverride
         @context.use Middleware::ContentLength
         @context.use Middleware::NormalizeBody
       end

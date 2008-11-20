@@ -8,5 +8,6 @@ module Invisible
     env_attr_accessor :context
     env_attr_accessor :pipeline
     env_attr_accessor :layout
+    env_attr_accessor :path_params
   end
 end

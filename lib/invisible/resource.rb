@@ -1,5 +1,6 @@
 module Invisible
   module Resource
+    include Routing
     extend Forwardable
     
     attr_accessor :pipeline, :path, :actions, :resources
@@ -27,8 +28,8 @@ module Invisible
     
     HTTP_METHODS.each do |method|
       module_eval <<-EOS
-        def #{method}(path=nil, &block)
-          klass = path ? resource(path) : self
+        def #{method}(path="/", &block)
+          klass = path == "/" ? self : resource(path)
           klass.actions["#{method.to_s.upcase}"] = klass.new("#{method.to_s.upcase}", &block)
         end
       EOS
@@ -43,21 +44,22 @@ module Invisible
         request.pipeline = @pipeline
       end
       
-      if @path == request.path_info && action = actions[request.request_method] # TODO match
-        request.context = action
-        action.prepare(env)
-        response = request.pipeline.apply(action).call(env)
-      elsif resource = resources.detect { |resource| request.path_info.index(resource.path) }
-        response = resource.call(env)
+      if action = dispatch(request)
+        action.prepare(request).call(env)
+      else
+        Response.new("Not found", 404).finish
       end
-      
-      response || Rack::Response.new("Not found", 404).finish
+    end
+    
+    def prepare(request)
+      self
     end
     
     private
       def init(path)
         @pipeline  = Pipeline.new
         @path      = path
+        @route     = build_route(path)
         @actions   = {}
         @resources = []
       end

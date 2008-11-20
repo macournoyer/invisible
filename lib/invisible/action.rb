@@ -9,14 +9,15 @@ module Invisible
       @block  = block
     end
     
-    def prepare(env)
-      @request  = Request.new(env)
+    def prepare(request)
+      @request  = request
       @response = Response.new
-      @params   = @request.params
+      @params   = @request.params.merge(@request.path_params)
+      
+      @request.pipeline.apply(self)
     end
     
     def call(env)
-      prepare(env)
       instance_eval(&@block)
       @response.finish
     end
