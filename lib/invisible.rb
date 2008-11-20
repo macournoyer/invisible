@@ -29,12 +29,12 @@ module Invisible
   autoload :Resource,        "invisible/resource"
   autoload :Response,        "invisible/response"
   autoload :Routing,         "invisible/routing"
+  autoload :Template,        "invisible/template"
   
   module Middleware
     autoload :Before,        "invisible/middleware/before"
     autoload :ContentLength, "invisible/middleware/content_length"
     autoload :Layout,        "invisible/middleware/layout"
     autoload :NormalizeBody, "invisible/middleware/normalize_body"
-    autoload :Reloader,      "invisible/middleware/reloader"
   end
 end

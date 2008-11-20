@@ -1,16 +1,15 @@
 require "erb"
 
-class Invisible
-  include ERB::Util
-  
-  # Evaluate the ERB template in +file+ and returns the
-  # result as a string.
-  # Use with +render+:
-  # 
-  #   render erb(:muffin)
-  # 
-  def erb(file)
-    path = File.join(@root, "views", file.to_s)
-    ERB.new(File.read("#{path}.erb")).result(binding)
+module Invisible
+  module Rendering
+    module Erb
+      extend self
+      
+      Template.register_engine self, :erb
+      
+      def render(string, context)
+        ERB.new(string).result(context.send(:binding))
+      end
+    end
   end
 end

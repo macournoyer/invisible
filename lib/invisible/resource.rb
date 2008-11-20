@@ -1,6 +1,5 @@
 module Invisible
   module Resource
-    include Routing
     extend Forwardable
     
     attr_accessor :pipeline, :path, :actions, :resources

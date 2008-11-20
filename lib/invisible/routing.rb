@@ -1,7 +1,7 @@
 module Invisible
   module Routing
     class Route
-      attr_reader :path, :pattern, :params
+      attr_reader :path, :params
       
       def initialize(path)
         @path = path
