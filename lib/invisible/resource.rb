@@ -59,7 +59,6 @@ module Invisible
       def init(path)
         @pipeline  = Pipeline.new
         @path      = path
-        @route     = build_route(path)
         @actions   = {}
         @resources = []
       end
