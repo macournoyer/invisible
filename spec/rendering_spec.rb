@@ -6,13 +6,10 @@ describe Rendering do
       get do
         render "root"
       end
-
-      get "options" do
-        $env = request.env
-        render "options", :some => "option"
-      end
       
-      use GetEnv
+      get "/status" do
+        render "", :status => 201
+      end
     end
   end
   
@@ -20,8 +17,11 @@ describe Rendering do
     @app.mock.get("/").body.should == "root"
   end
   
-  it "should set render options in request env" do
-    @app.mock.get("/options")
-    GetEnv.env["invisible.render_options"].should == { :some => "option" }
+  it "should default status to 200" do
+    @app.mock.get("/").status.should == 200
+  end
+
+  it "should render with status code" do
+    @app.mock.get("/status").status.should == 201
   end
 end

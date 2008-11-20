@@ -7,16 +7,8 @@ module Invisible
       end
       
       def call(env)
-        status, headers, body = @app.call(env)
-        
-        # Only one layout can be applied
-        if !env.has_key?("invisible.layout") && env.has_key?("invisible.context")
-          context = env["invisible.context"]
-          body = context.render("[#{body}]")
-          env["invisible.layout"] = true
-        end
-        
-        [status, headers, body]
+        env["invisible.layout"] = @name
+        @app.call(env)
       end
     end
   end

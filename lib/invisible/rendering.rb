@@ -1,9 +1,13 @@
 module Invisible
   module Rendering
-    def render(*args, &block)
-      options = args.last.is_a?(Hash) ? args.pop : {}
-      request.render_options = options
-      response.body = args.first
+    def render(content, options={})
+      options[:layout] = request.layout if options[:layout].nil?
+      
+      # TODO
+      # if options[:layout]
+      
+      response.status = options[:status] || 200
+      response.body   = content
     end
   end
 end
