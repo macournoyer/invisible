@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
 describe Routing do
-  before do
+  before :all do
     @app = Application.new do
       get "/path" do
         render "/path"
@@ -83,5 +83,31 @@ describe Routing do
 
   it "should route ignore trailing slash" do
     @app.mock.get("/no/slash/").body.should == "no-slash"
+  end
+  
+  describe "with nested resources" do
+    before :all do
+      @app = Application.new do
+        resource "/some/:stuff" do
+          get do
+            render params[:stuff]
+          end
+          
+          resource ":really" do
+            get ":awesome" do
+              render params.inspect
+            end
+          end
+        end
+      end
+    end
+    
+    it "should route nested /some/:param" do
+      @app.mock.get("/some/stuff").body.should == "stuff"
+    end
+
+    it "should route nested /some/:param/:really/:awesome" do
+      @app.mock.get("/some/stuff/that/stinks").body.should == { :stuff => "stuff", :really => "that", :awesome => "stinks" }.inspect
+    end
   end
 end

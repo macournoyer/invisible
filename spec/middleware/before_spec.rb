@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + "/../spec_helper"
 
-describe Middleware::ContentLength do
+describe Middleware::Before do
   before do
     @app = Application.new do
       resource "context" do

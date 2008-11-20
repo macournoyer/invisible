@@ -3,6 +3,7 @@ require 'invisible'
 require 'invisible/mock'
 require 'rubygems'
 require 'spec'
+require 'pp'
 
 include Invisible
 

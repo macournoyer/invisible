@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + "/spec_helper"
 
 describe Resource do
-  before do
+  before :all do
     @app = Application.new do
       get do
         render "root"
