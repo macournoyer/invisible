@@ -17,7 +17,10 @@ module Invisible
     end
     
     def call(env)
-      instance_eval(&@block)
+      instance_eval(&@block) if @block
+      
+      render unless @request.rendered
+      
       @response.finish
     end
   end

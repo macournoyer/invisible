@@ -30,6 +30,10 @@ module Invisible
           path_params.symbolize_keys
         end
       end
+      
+      def to_filename
+        @path.delete(":")
+      end
     end
     
     def route

@@ -4,6 +4,8 @@ module Invisible
     
     def_delegators :@context, :call
     
+    attr_reader :template_locator
+    
     def initialize(&block)
       @context = Context.create("/", &block)
       install_default_middlewares

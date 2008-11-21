@@ -5,7 +5,7 @@ describe Middleware::Before do
     @app = Application.new do
       resource "context" do
         before { @c = self }
-        get    { render @c == self }
+        get    { render((@c == self).to_s) }
       end
 
       resource "ivar" do
@@ -19,7 +19,7 @@ describe Middleware::Before do
           response.headers
           params[:w00t]
         end
-        get { }
+        get { render :nothing }
       end
     end
   end

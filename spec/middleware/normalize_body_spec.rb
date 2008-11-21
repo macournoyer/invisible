@@ -11,14 +11,6 @@ describe Middleware::NormalizeBody do
         render "ohaie"
       end
       
-      get "nil" do
-        render nil
-      end
-      
-      get "true" do
-        render true
-      end
-      
       use Middleware::NormalizeBody
     end
   end
@@ -29,13 +21,5 @@ describe Middleware::NormalizeBody do
 
   it "should normalize string body" do
     @app.mock.get("/string").body.should == "ohaie"
-  end
-
-  it "should normalize nil body" do
-    @app.mock.get("/nil").body.should == ""
-  end
-
-  it "should normalize random body" do
-    @app.mock.get("/true").body.should == "true"
   end
 end

@@ -9,5 +9,14 @@ module Invisible
     env_attr_accessor :pipeline
     env_attr_accessor :layout
     env_attr_accessor :path_params
+    env_attr_accessor :rendered
+    
+    def format
+      File.extname(path_info)[1..-1] || "html"
+    end
+    
+    def resource
+      context.class
+    end
   end
 end
