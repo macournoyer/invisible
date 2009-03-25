@@ -52,6 +52,7 @@ gemspec = Gem::Specification.new do |s|
   # Dependencies
   s.add_dependency    "rack",    ">= 0.4.0"
   s.add_dependency    "markaby", ">= 0.5"
+  s.add_dependency    "rubigen", ">= 1.3.3"
   
   # Binary
   s.bindir             = "bin"

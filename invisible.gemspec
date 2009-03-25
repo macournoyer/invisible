@@ -9,7 +9,7 @@ autorequire:
 bindir: bin
 cert_chain: []
 
-date: 2008-11-12 00:00:00 -05:00
+date: 2009-03-24 00:00:00 -04:00
 default_executable: invisible
 dependencies: 
 - !ruby/object:Gem::Dependency 
@@ -31,6 +31,16 @@ dependencies:
     - - ">="
       - !ruby/object:Gem::Version 
         version: "0.5"
+    version: 
+- !ruby/object:Gem::Dependency 
+  name: rubigen
+  type: :runtime
+  version_requirement: 
+  version_requirements: !ruby/object:Gem::Requirement 
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        version: 1.3.3
     version: 
 description: Invisible is like a giant robot combining the awesomeness of Rails, Merb, Camping and Sinatra. Except, it's tiny (100 sloc).
 email: macournoyer@gmail.com
@@ -111,7 +121,7 @@ required_rubygems_version: !ruby/object:Gem::Requirement
 requirements: []
 
 rubyforge_project: 
-rubygems_version: 1.2.0
+rubygems_version: 1.3.1
 signing_key: 
 specification_version: 2
 summary: The Invisible Web Framework
